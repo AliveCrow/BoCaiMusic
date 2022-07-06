@@ -1,13 +1,10 @@
 <template>
-<div>
-  index
-</div>
 </template>
 
-<script>
-export default {
-  name: "index"
-}
+<script setup lang="ts">
+import Nav from "@/components/Nav/Nav";
+
+
 </script>
 
 <style scoped>
