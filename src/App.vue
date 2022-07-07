@@ -3,7 +3,6 @@
     <a-layout-header>
       <Nav />
       <Carousel  />
-      <Menu />
     </a-layout-header>
     <a-layout-content>
       <router-view/>
@@ -13,12 +12,10 @@
 </template>
 <script setup>
 import Nav from "@/components/Nav/Nav";
-import Carousel from "@/components/Carousel/Carousel";
-import Menu from "@/components/Menu/Menu";
-</script>
+import Carousel from "@/components/Carousel/Carousel";</script>
 <style lang="scss">
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
+  font-family: Roboto-Medium, Roboto, Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   color: #2c3e50;

@@ -1,4 +1,4 @@
-# music-vue3-ts-
+# BoCaiMusic
 
 ## Project setup
 ```

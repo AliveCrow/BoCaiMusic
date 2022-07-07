@@ -16,7 +16,7 @@
 <style scoped lang="less">
 .menu {
   box-sizing: border-box;
-  padding: 0 200px;
+  padding: 0 150px;
   border-bottom: 3px solid #F4F4F4;
   margin-bottom: 80px;
   margin-top: 20px;

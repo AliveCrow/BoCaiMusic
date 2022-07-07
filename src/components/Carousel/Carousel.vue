@@ -5,6 +5,8 @@
         '--swiper-navigation-color': '#fff',
       }"
       :modules="modules"
+      :loop="true"
+      :autoplay="true"
       direction="horizontal"
       :slides-per-view="3"
       :space-between="30"
