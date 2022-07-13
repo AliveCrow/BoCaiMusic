@@ -49,15 +49,7 @@ const navList: NavItem[] = [
   {
     label: '排行榜',
     routeName: 'Rank'
-  },
-  {
-    label: '专辑(test)',
-    routeName: 'Album'
-  },
-  {
-    label: '歌手(test)',
-    routeName: 'Singer'
-  },
+  }
 ]
 const data = ref<string[]>([])
 
