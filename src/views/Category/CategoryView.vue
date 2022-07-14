@@ -3,12 +3,13 @@
     <a-space wrap >
       <a-tag
           checkable
-          :default-checked="false"
-          v-for="item in tagList"
-          :key="item.label"
+          v-for="(item,index) in tagList"
+          :checked="item.checked"
+          :key="`${item.label}${index}`"
           class="new-tag"
+          @click="handleChecked(item)"
       >
-        {{item.label}}
+        {{ item.label }}{{ index }}
       </a-tag>
     </a-space>
   </div>
@@ -319,40 +320,22 @@
 </template>
 
 <script setup lang="ts">
-import { IconArrowRight, IconArrowLeft} from "@arco-design/web-vue/es/icon";
+import {IconArrowLeft, IconArrowRight} from "@arco-design/web-vue/es/icon";
+import {ref} from "vue";
 
-const tagList = [
-  {
-    label: 'Awesome',
-  },
-  {
-    label: 'Awesome',
-  },
-  {
-    label: 'Awesome',
-  },
-  {
-    label: 'Awesome',
-  },
-  {
-    label: 'Awesome',
-  },
-  {
-    label: 'Awesome',
-  },
-  {
-    label: 'Awesome',
-  },
-  {
-    label: 'Awesome',
-  },
-  {
-    label: 'Awesome',
-  },
-  {
-    label: 'Awesome',
-  },
-]
+type tag = {
+  label: string
+  checked: boolean
+}
+
+const tagList = ref<tag[]>([])
+
+const handleChecked = (item: tag) => {
+  tagList.value.forEach(r => {
+    r.checked = false
+    r.checked = r.label === item.label;
+  })
+}
 </script>
 
 <style scoped lang="less">

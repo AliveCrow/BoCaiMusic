@@ -1,10 +1,9 @@
 <template>
   <Carousel  />
 
-  <Menu/>
+  <Menu title="新歌首发" :tabs="menuTabs"/>
 
   <div class="discover">
-
     <Card style="height: 740px">
       <template #title>
         <div class="discover-card-title">最新</div>
@@ -618,24 +617,37 @@
 </template>
 
 <script setup lang="ts">
-import Carousel from "@/components/Carousel/Carousel";
-import Menu from "@/components/Menu/Menu";
+import Carousel from "@/components/Carousel/Carousel.vue";
 import {IconArrowLeft, IconArrowRight} from "@arco-design/web-vue/es/icon";
+import {tab} from '@/types/common'
 
 const headerStyle = {
   height: '90px'
 }
+
+const menuTabs: tab[] = [
+  {
+    label: '最新',
+  },
+  {
+    label: '内地',
+  },
+  {
+    label: '港台',
+  },
+  {
+    label: '欧美',
+  },
+  {
+    label: '韩国',
+  },
+  {
+    label: '日本',
+  },
+]
 </script>
 
 <style scoped lang="less">
-@text-color: #666;
-@icon-color: #808080;
-.text-ellipsis {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
 .hot {
   height: 561px !important;
   background: #FFFFFF;
@@ -645,93 +657,6 @@ const headerStyle = {
 
 .discover {
   padding: 0 150px;
-
-  .row-image {
-    margin: 40px 0;
-
-    /deep/ .arco-image-img {
-      border-radius: 8px !important;
-    }
-
-    /deep/ .arco-image-footer-caption-title {
-      text-align: center
-    }
-  }
-
-  .discover-card-content {
-    padding: 40px;
-
-    .row-item {
-      width: 265px;
-      display: flex;
-      gap: 30px;
-
-      &-meta {
-        display: flex;
-        flex-direction: column;
-        width: 147px;
-
-        &-title {
-          width: 147px;
-          height: 27px;
-          font-size: 19px;
-          font-weight: 500;
-          color: #666666;
-          line-height: 27px;
-          -webkit-background-clip: text;
-          .text-ellipsis
-        }
-
-        &-description {
-          width: 147px;
-          height: 33px;
-          font-size: 16px;
-          font-weight: 500;
-          color: #B3B3B3;
-          line-height: 33px;
-          -webkit-background-clip: text;
-          .text-ellipsis
-        }
-      }
-    }
-  }
-
-  .discover-card-item {
-    height: 260px;
-    margin-bottom: 35px;
-
-    /deep/ .arco-card-body {
-      padding: 0;
-    }
-  }
-
-  .discover-card-meta {
-    padding: 0 10px;
-
-    &-title {
-      width: 183px;
-      .text-ellipsis
-    }
-
-    &-description {
-      width: 183px;
-      .text-ellipsis
-    }
-  }
-
-  .discover-card-icon {
-    color: @icon-color;
-  }
-
-  .discover-card-title {
-    height: 30px;
-    font-size: 16px;
-    font-weight: 500;
-    color: @text-color;
-    line-height: 30px;
-    -webkit-background-clip: text;
-  }
-
-
+  .card-style();
 }
 </style>

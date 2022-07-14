@@ -11,16 +11,29 @@
         {{ item.label }}
       </a-button>
     </a-space>
-    <a-dropdown>
+    <a-dropdown @select="onDropdownSelect">
       <a-avatar :style="{ backgroundColor: '#999999' }">
         <IconUser/>
       </a-avatar>
       <template #content>
-        <a-doption>Option 1</a-doption>
-        <a-doption disabled>Option 2</a-doption>
-        <a-doption :value="{ value: 'Option3' }">Option 3</a-doption>
+        <a-doption v-for="item in dropdownList" :key="item.label" :value="item" :disabled="item.disabled">{{ item.label }}</a-doption>
       </template>
     </a-dropdown>
+    <a-modal width="400"  v-model:visible="visible" @cancel="visible = false" :on-before-ok="handleBeforeOk" unmountOnClose>
+      <template #title>
+        Title
+      </template>
+      <div>
+        <a-form :model="form" :style="{width:'400px'}">
+          <a-form-item field="name" label="账号">
+            <a-input v-model="form.name" placeholder="please enter your 账号..." />
+          </a-form-item>
+          <a-form-item field="post" label="密码">
+            <a-input v-model="form.post" placeholder="please enter your 密码..." />
+          </a-form-item>
+        </a-form>
+      </div>
+    </a-modal>
   </div>
 </template>
 
@@ -28,7 +41,7 @@
 import CONFIG from '/config.json'
 import {IconUser} from '@arco-design/web-vue/es/icon';
 import {useRoute, useRouter} from "vue-router";
-import {ref} from "vue";
+import {ref,reactive} from "vue";
 
 interface NavItem {
   label: string,
@@ -64,6 +77,40 @@ const handleSearch = (value: string) => {
     data.value = []
   }
 }
+
+const dropdownList = [
+  {
+    label: '登陆',
+    name: 'Login',
+    disabled: false
+  },
+  {
+    label: '主页',
+    name: 'Mine',
+    disabled: false
+  },
+  {
+    label: '退出登陆',
+    name: 'LogOut',
+    disabled: false
+  }
+]
+const visible = ref(false);
+const onDropdownSelect = (e: { label: string, name: string }) => {
+  if(e.label === '登陆') {
+    visible.value = true
+  } else {
+    router.push({name: e.name})
+  }
+}
+const handleBeforeOk = (done: (closed: boolean) => void) => {
+  done(true)
+}
+
+const form = reactive({
+  name: '',
+  post: '',
+})
 
 </script>
 

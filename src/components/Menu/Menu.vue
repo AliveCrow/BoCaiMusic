@@ -1,18 +1,36 @@
 <template>
   <div class="menu">
-    <a-menu mode="horizontal" :default-selected-keys="['1']">
-      <a-menu-item key="0" :style="{ padding: 0, marginRight: '38px' }" disabled>
-        <div class="menu-logo">新歌首发</div>
+    <a-menu mode="horizontal" :default-selected-keys="defaultSelectedKeys">
+      <a-menu-item key="-1" :style="{ padding: 0, marginRight: '38px' }" disabled>
+        <div class="menu-logo">{{title}}</div>
       </a-menu-item>
-      <a-menu-item key="1">最新</a-menu-item>
-      <a-menu-item key="2">内地</a-menu-item>
-      <a-menu-item key="3">港台</a-menu-item>
-      <a-menu-item key="4">欧美</a-menu-item>
-      <a-menu-item key="5">韩国</a-menu-item>
-      <a-menu-item key="6">日本</a-menu-item>
+      <MenuItem :tabs="tabs" />
     </a-menu>
   </div>
 </template>
+
+<script setup lang="ts">
+import { defineProps} from "vue";
+import MenuItem from './MenuItem.vue'
+
+defineProps({
+    title: String,
+    tabs: {
+      type: Array,
+      default: () => []
+    },
+    defaultSelectedKeys: {
+      type: Array,
+      default: () => ['1']
+    }
+})
+
+</script>
+<style lang="less">
+.arco-trigger-menu-selected {
+  color: @theme-color !important
+}
+</style>
 <style scoped lang="less">
 .menu {
   box-sizing: border-box;
@@ -20,6 +38,8 @@
   border-bottom: 3px solid #F4F4F4;
   margin-bottom: 80px;
   margin-top: 20px;
+
+
 
   .menu-logo {
     height: 80px;

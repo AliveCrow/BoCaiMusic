@@ -1,3 +1,99 @@
 
 @theme-color: #1875F0;
 @secondary-color: #999999;
+
+@text-color: #666;
+@icon-color: #808080;
+.card-style {
+  .text-ellipsis {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .row-image {
+    margin: 40px 0;
+
+    /deep/ .arco-image-img {
+      border-radius: 8px !important;
+    }
+
+    /deep/ .arco-image-footer-caption-title {
+      text-align: center
+    }
+  }
+
+  .discover-card-content {
+    padding: 40px;
+
+    .row-item {
+      width: 265px;
+      display: flex;
+      gap: 30px;
+
+      &-meta {
+        display: flex;
+        flex-direction: column;
+        width: 147px;
+
+        &-title {
+          width: 147px;
+          height: 27px;
+          font-size: 19px;
+          font-weight: 500;
+          color: #666666;
+          line-height: 27px;
+          -webkit-background-clip: text;
+          .text-ellipsis
+        }
+
+        &-description {
+          width: 147px;
+          height: 33px;
+          font-size: 16px;
+          font-weight: 500;
+          color: #B3B3B3;
+          line-height: 33px;
+          -webkit-background-clip: text;
+          .text-ellipsis
+        }
+      }
+    }
+  }
+
+  .discover-card-item {
+    height: 260px;
+    margin-bottom: 35px;
+
+    /deep/ .arco-card-body {
+      padding: 0;
+    }
+  }
+
+  .discover-card-meta {
+    padding: 0 10px;
+
+    &-title {
+      width: 183px;
+      .text-ellipsis
+    }
+
+    &-description {
+      width: 183px;
+      .text-ellipsis
+    }
+  }
+
+  .discover-card-icon {
+    color: @icon-color;
+  }
+
+  .discover-card-title {
+    height: 30px;
+    font-size: 16px;
+    font-weight: 500;
+    color: @text-color;
+    line-height: 30px;
+    -webkit-background-clip: text;
+  }
+}
