@@ -3,20 +3,20 @@
     <a-space wrap >
       <a-tag
           checkable
-          v-for="(item,index) in tagList"
-          :checked="item.checked"
-          :key="`${item.label}${index}`"
+          v-for="item in categoryList"
+          :checked="item.categoryId === currentTag.categoryId"
+          :key="item.categoryId"
           class="new-tag"
           @click="handleChecked(item)"
       >
-        {{ item.label }}{{ index }}
+        {{ item.categoryName }}
       </a-tag>
     </a-space>
   </div>
 
   <Card style="height: 740px; margin: 0 150px">
     <template #title>
-      <div class="card-title">Awesome</div>
+      <div class="card-title">{{currentTag.categoryName}}</div>
     </template>
     <template #extra>
       <a-space>
@@ -34,285 +34,35 @@
     </template>
     <template>
       <div class="discover-card-content">
-        <a-row :gutter="30" style="justify-content: space-between">
-          <a-col :span="4">
-            <a-card :bordered="false" class="discover-card-item">
-              <template #cover>
-                <div
-                    :style="{overflow: 'hidden'}"
-                >
-                  <img
-                      :style="{ width: '203px', height: '203px', transform: 'translateY(-20px)' }"
-                      alt="dessert"
-                      src="https://p1-arco.byteimg.com/tos-cn-i-uwbnlip3yd/a20012a2d4d5b9db43dfc6a01fe508c0.png~tplv-uwbnlip3yd-webp.webp"
-                  />
-                </div>
-              </template>
-              <a-card-meta class="discover-card-meta">
-                <template #title>
-                  <div class="discover-card-meta-title">Card TitleCard TitleCard TitleCard TitleCard Title123</div>
+        <a-spin :loading="loading">
+          <a-row :gutter="30" style="justify-content: space-between">
+            <a-col :span="4" v-for="diss in dissList" :key="diss.dissid">
+              <a-card :bordered="false" class="discover-card-item">
+                <template #cover>
+                  <div
+                      :style="{overflow: 'hidden'}"
+                  >
+                    <img
+                        :style="{ width: '203px', height: '203px', transform: 'translateY(-20px)' }"
+                        alt="dessert"
+                        :src="diss.imgurl"
+                    />
+                  </div>
                 </template>
-                <template #description>
-                  <div class="discover-card-meta-description">Card content</div>
-                </template>
-              </a-card-meta>
-            </a-card>
-          </a-col>
-          <a-col :span="4">
-            <a-card :bordered="false" class="discover-card-item">
-              <template #cover>
-                <div
-                    :style="{overflow: 'hidden'}"
-                >
-                  <img
-                      :style="{ width: '203px', height: '203px', transform: 'translateY(-20px)' }"
-                      alt="dessert"
-                      src="https://p1-arco.byteimg.com/tos-cn-i-uwbnlip3yd/a20012a2d4d5b9db43dfc6a01fe508c0.png~tplv-uwbnlip3yd-webp.webp"
-                  />
-                </div>
-              </template>
-              <a-card-meta class="discover-card-meta">
-                <template #title>
-                  <div class="discover-card-meta-title">Card TitleCard TitleCard TitleCard TitleCard Title123</div>
-                </template>
-                <template #description>
-                  <div class="discover-card-meta-description">Card content</div>
-                </template>
-              </a-card-meta>
-            </a-card>
-          </a-col>
-          <a-col :span="4">
-            <a-card :bordered="false" class="discover-card-item">
-              <template #cover>
-                <div
-                    :style="{overflow: 'hidden'}"
-                >
-                  <img
-                      :style="{ width: '203px', height: '203px', transform: 'translateY(-20px)' }"
-                      alt="dessert"
-                      src="https://p1-arco.byteimg.com/tos-cn-i-uwbnlip3yd/a20012a2d4d5b9db43dfc6a01fe508c0.png~tplv-uwbnlip3yd-webp.webp"
-                  />
-                </div>
-              </template>
-              <a-card-meta class="discover-card-meta">
-                <template #title>
-                  <div class="discover-card-meta-title">Card TitleCard TitleCard TitleCard TitleCard Title123</div>
-                </template>
-                <template #description>
-                  <div class="discover-card-meta-description">Card content</div>
-                </template>
-              </a-card-meta>
-            </a-card>
-          </a-col>
-          <a-col :span="4">
-            <a-card :bordered="false" class="discover-card-item">
-              <template #cover>
-                <div
-                    :style="{overflow: 'hidden'}"
-                >
-                  <img
-                      :style="{ width: '203px', height: '203px', transform: 'translateY(-20px)' }"
-                      alt="dessert"
-                      src="https://p1-arco.byteimg.com/tos-cn-i-uwbnlip3yd/a20012a2d4d5b9db43dfc6a01fe508c0.png~tplv-uwbnlip3yd-webp.webp"
-                  />
-                </div>
-              </template>
-              <a-card-meta class="discover-card-meta">
-                <template #title>
-                  <div class="discover-card-meta-title">Card TitleCard TitleCard TitleCard TitleCard Title123</div>
-                </template>
-                <template #description>
-                  <div class="discover-card-meta-description">Card content</div>
-                </template>
-              </a-card-meta>
-            </a-card>
-          </a-col>
-          <a-col :span="4">
-            <a-card :bordered="false" class="discover-card-item">
-              <template #cover>
-                <div
-                    :style="{overflow: 'hidden'}"
-                >
-                  <img
-                      :style="{ width: '203px', height: '203px', transform: 'translateY(-20px)' }"
-                      alt="dessert"
-                      src="https://p1-arco.byteimg.com/tos-cn-i-uwbnlip3yd/a20012a2d4d5b9db43dfc6a01fe508c0.png~tplv-uwbnlip3yd-webp.webp"
-                  />
-                </div>
-              </template>
-              <a-card-meta class="discover-card-meta">
-                <template #title>
-                  <div class="discover-card-meta-title">Card TitleCard TitleCard TitleCard TitleCard Title123</div>
-                </template>
-                <template #description>
-                  <div class="discover-card-meta-description">Card content</div>
-                </template>
-              </a-card-meta>
-            </a-card>
-          </a-col>
-          <a-col :span="4">
-            <a-card :bordered="false" class="discover-card-item">
-              <template #cover>
-                <div
-                    :style="{overflow: 'hidden'}"
-                >
-                  <img
-                      :style="{ width: '203px', height: '203px', transform: 'translateY(-20px)' }"
-                      alt="dessert"
-                      src="https://p1-arco.byteimg.com/tos-cn-i-uwbnlip3yd/a20012a2d4d5b9db43dfc6a01fe508c0.png~tplv-uwbnlip3yd-webp.webp"
-                  />
-                </div>
-              </template>
-              <a-card-meta class="discover-card-meta">
-                <template #title>
-                  <div class="discover-card-meta-title">Card TitleCard TitleCard TitleCard TitleCard Title123</div>
-                </template>
-                <template #description>
-                  <div class="discover-card-meta-description">Card content</div>
-                </template>
-              </a-card-meta>
-            </a-card>
-          </a-col>
-
-          <a-col :span="4">
-            <a-card :bordered="false" class="discover-card-item">
-              <template #cover>
-                <div
-                    :style="{overflow: 'hidden'}"
-                >
-                  <img
-                      :style="{ width: '203px', height: '203px', transform: 'translateY(-20px)' }"
-                      alt="dessert"
-                      src="https://p1-arco.byteimg.com/tos-cn-i-uwbnlip3yd/a20012a2d4d5b9db43dfc6a01fe508c0.png~tplv-uwbnlip3yd-webp.webp"
-                  />
-                </div>
-              </template>
-              <a-card-meta class="discover-card-meta">
-                <template #title>
-                  <div class="discover-card-meta-title">Card TitleCard TitleCard TitleCard TitleCard Title123</div>
-                </template>
-                <template #description>
-                  <div class="discover-card-meta-description">Card content</div>
-                </template>
-              </a-card-meta>
-            </a-card>
-          </a-col>
-          <a-col :span="4">
-            <a-card :bordered="false" class="discover-card-item">
-              <template #cover>
-                <div
-                    :style="{overflow: 'hidden'}"
-                >
-                  <img
-                      :style="{ width: '203px', height: '203px', transform: 'translateY(-20px)' }"
-                      alt="dessert"
-                      src="https://p1-arco.byteimg.com/tos-cn-i-uwbnlip3yd/a20012a2d4d5b9db43dfc6a01fe508c0.png~tplv-uwbnlip3yd-webp.webp"
-                  />
-                </div>
-              </template>
-              <a-card-meta class="discover-card-meta">
-                <template #title>
-                  <div class="discover-card-meta-title">Card TitleCard TitleCard TitleCard TitleCard Title123</div>
-                </template>
-                <template #description>
-                  <div class="discover-card-meta-description">Card content</div>
-                </template>
-              </a-card-meta>
-            </a-card>
-          </a-col>
-          <a-col :span="4">
-            <a-card :bordered="false" class="discover-card-item">
-              <template #cover>
-                <div
-                    :style="{overflow: 'hidden'}"
-                >
-                  <img
-                      :style="{ width: '203px', height: '203px', transform: 'translateY(-20px)' }"
-                      alt="dessert"
-                      src="https://p1-arco.byteimg.com/tos-cn-i-uwbnlip3yd/a20012a2d4d5b9db43dfc6a01fe508c0.png~tplv-uwbnlip3yd-webp.webp"
-                  />
-                </div>
-              </template>
-              <a-card-meta class="discover-card-meta">
-                <template #title>
-                  <div class="discover-card-meta-title">Card TitleCard TitleCard TitleCard TitleCard Title123</div>
-                </template>
-                <template #description>
-                  <div class="discover-card-meta-description">Card content</div>
-                </template>
-              </a-card-meta>
-            </a-card>
-          </a-col>
-          <a-col :span="4">
-            <a-card :bordered="false" class="discover-card-item">
-              <template #cover>
-                <div
-                    :style="{overflow: 'hidden'}"
-                >
-                  <img
-                      :style="{ width: '203px', height: '203px', transform: 'translateY(-20px)' }"
-                      alt="dessert"
-                      src="https://p1-arco.byteimg.com/tos-cn-i-uwbnlip3yd/a20012a2d4d5b9db43dfc6a01fe508c0.png~tplv-uwbnlip3yd-webp.webp"
-                  />
-                </div>
-              </template>
-              <a-card-meta class="discover-card-meta">
-                <template #title>
-                  <div class="discover-card-meta-title">Card TitleCard TitleCard TitleCard TitleCard Title123</div>
-                </template>
-                <template #description>
-                  <div class="discover-card-meta-description">Card content</div>
-                </template>
-              </a-card-meta>
-            </a-card>
-          </a-col>
-          <a-col :span="4">
-            <a-card :bordered="false" class="discover-card-item">
-              <template #cover>
-                <div
-                    :style="{overflow: 'hidden'}"
-                >
-                  <img
-                      :style="{ width: '203px', height: '203px', transform: 'translateY(-20px)' }"
-                      alt="dessert"
-                      src="https://p1-arco.byteimg.com/tos-cn-i-uwbnlip3yd/a20012a2d4d5b9db43dfc6a01fe508c0.png~tplv-uwbnlip3yd-webp.webp"
-                  />
-                </div>
-              </template>
-              <a-card-meta class="discover-card-meta">
-                <template #title>
-                  <div class="discover-card-meta-title">Card TitleCard TitleCard TitleCard TitleCard Title123</div>
-                </template>
-                <template #description>
-                  <div class="discover-card-meta-description">Card content</div>
-                </template>
-              </a-card-meta>
-            </a-card>
-          </a-col>
-          <a-col :span="4">
-            <a-card :bordered="false" class="discover-card-item">
-              <template #cover>
-                <div
-                    :style="{overflow: 'hidden'}"
-                >
-                  <img
-                      :style="{ width: '203px', height: '203px', transform: 'translateY(-20px)' }"
-                      alt="dessert"
-                      src="https://p1-arco.byteimg.com/tos-cn-i-uwbnlip3yd/a20012a2d4d5b9db43dfc6a01fe508c0.png~tplv-uwbnlip3yd-webp.webp"
-                  />
-                </div>
-              </template>
-              <a-card-meta class="discover-card-meta">
-                <template #title>
-                  <div class="discover-card-meta-title">Card TitleCard TitleCard TitleCard TitleCard Title123</div>
-                </template>
-                <template #description>
-                  <div class="discover-card-meta-description">Card content</div>
-                </template>
-              </a-card-meta>
-            </a-card>
-          </a-col>
-        </a-row>
+                <a-card-meta class="discover-card-meta">
+                  <template #title>
+                    <div class="discover-card-meta-title">{{ diss.dissname }}</div>
+                  </template>
+                  <template #description>
+                    <div class="discover-card-meta-description" v-for="item in diss.creator" :key="item.encrypt_uin">
+                      {{ item.name }}
+                    </div>
+                  </template>
+                </a-card-meta>
+              </a-card>
+            </a-col>
+          </a-row>
+        </a-spin>
       </div>
     </template>
   </Card>
@@ -321,21 +71,36 @@
 
 <script setup lang="ts">
 import {IconArrowLeft, IconArrowRight} from "@arco-design/web-vue/es/icon";
-import {ref} from "vue";
+import {useCategory} from "@/hooks";
+import useAppStore from "@/store";
+import {storeToRefs} from "pinia";
 
 type tag = {
-  label: string
-  checked: boolean
+  allsorts?: [],
+  categoryId: number,
+  categoryName: string,
+  usable: number
 }
 
-const tagList = ref<tag[]>([])
-
+const appStore = useAppStore()
+const {currentTag} = storeToRefs(appStore)
+currentTag.value.categoryName = '全部'
 const handleChecked = (item: tag) => {
-  tagList.value.forEach(r => {
-    r.checked = false
-    r.checked = r.label === item.label;
-  })
+  currentTag.value = item
+  getSongListByCategoryId()
 }
+
+let {
+  loading,
+  pageSize,
+  currentPage,
+  dissList,
+  categoryList,
+  getCategoryList,
+  getSongListByCategoryId
+} = useCategory()
+getCategoryList()
+getSongListByCategoryId()
 </script>
 
 <style scoped lang="less">

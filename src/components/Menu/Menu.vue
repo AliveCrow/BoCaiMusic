@@ -1,7 +1,7 @@
 <template>
   <div class="menu">
-    <a-menu mode="horizontal" :default-selected-keys="defaultSelectedKeys">
-      <a-menu-item key="-1" :style="{ padding: 0, marginRight: '38px' }" disabled>
+    <a-menu mode="horizontal" :default-selected-keys="defaultSelectedKeys" @menu-item-click="onMenuItemClick">
+      <a-menu-item key="-1" :style="{ padding: 0, marginRight: '38px' }" disabled >
         <div class="menu-logo">{{title}}</div>
       </a-menu-item>
       <MenuItem :tabs="tabs" />
@@ -10,9 +10,12 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps} from "vue";
+import { defineProps, defineEmits} from "vue";
 import MenuItem from './MenuItem.vue'
 
+const emit =  defineEmits([
+    'tab-click'
+])
 defineProps({
     title: String,
     tabs: {
@@ -24,6 +27,9 @@ defineProps({
       default: () => ['1']
     }
 })
+const onMenuItemClick = (e: string) => {
+  emit('tab-click', e)
+}
 
 </script>
 <style lang="less">

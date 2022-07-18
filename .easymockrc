@@ -1,0 +1,11 @@
+{
+    "host": "http://124.222.191.214:7300",
+    "output": "src/api",
+    "template": "./easy-mock/request-tpl",
+    "projects": [
+        {
+            "id": "62d12f3b2dc6fd37bdd130c3",
+            "name": "BoCaiMusic"
+        }
+    ]
+}

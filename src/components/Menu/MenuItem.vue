@@ -8,7 +8,7 @@
       </a-sub-menu>
     </template>
     <template v-else>
-      <a-menu-item :key="`${index + 1}`">{{ tab.label }}</a-menu-item>
+      <a-menu-item :key="`${index + 1}`" >{{ tab.label }}</a-menu-item>
     </template>
   </template>
 </template>
@@ -21,6 +21,8 @@ import {tab} from '@/types/common'
 defineProps<{
   tabs: tab[]
 }>()
+
+
 
 </script>
 
