@@ -5,7 +5,7 @@
         <a-space direction="vertical" align="center" :size="25">
           <a-image
               width="200"
-              src="https://p1-arco.byteimg.com/tos-cn-i-uwbnlip3yd/a8c8cdb109cb051163646151a4a5083b.png~tplv-uwbnlip3yd-webp.webp"
+              :src="albumInfo.picurl"
           />
           <a-button type="primary" class="play-btn">
             <template #icon>
@@ -16,147 +16,30 @@
           </a-button>
         </a-space>
         <a-space direction="vertical" style="flex: 1">
-          <div class="album-name">Beauty Behind the Ma</div>
-          <div class="singer-name">The Weeknd</div>
-          <a-list>
-            <a-list-item class="list-item">
+          <div class="album-name">{{ albumInfo.name }}</div>
+          <a-typography-paragraph
+              :ellipsis="{
+                rows: 3,
+                expandable: true,
+              }"
+              class="singer-name">
+            {{ albumInfo.desc }}
+          </a-typography-paragraph>
+          <a-list :hoverable="true">
+            <a-list-item class="list-item" v-for="song in albumSongs" :key="song.id">
               <a-list-item-meta>
                 <template #title>
                   <div class="song-list-item">
                     <div class="song-list-item-name">
-                      <icon-play-circle-fill class="play" :size="32"/>
-                      <icon-pause-circle-fill class="pause" :size="32"/>
-                      <span>The Weeknd – Real Life</span>
+                      <icon-play-circle-fill v-if="isPaused" class="play" :size="32"/>
+                      <icon-pause-circle-fill v-else class="pause" :size="32"/>
+                      <span>{{ song.title }}</span>
                     </div>
-                    <span>04:34</span>
+                    <span>{{ getSongTime(song.interval) }}</span>
                   </div>
                 </template>
-              </a-list-item-meta>
-            </a-list-item>
-            <a-list-item class="list-item">
-              <a-list-item-meta>
-                <template #title>
-                  <div class="song-list-item">
-                    <div class="song-list-item-name">
-                      <icon-play-circle-fill class="play" :size="32"/>
-                      <icon-pause-circle-fill class="pause" :size="32"/>
-                      <span>The Weeknd – Real Life</span>
-                    </div>
-                    <span>04:34</span>
-                  </div>
-                </template>
-              </a-list-item-meta>
-            </a-list-item>
-            <a-list-item class="list-item">
-              <a-list-item-meta>
-                <template #title>
-                  <div class="song-list-item">
-                    <div class="song-list-item-name">
-                      <icon-play-circle-fill class="play" :size="32"/>
-                      <icon-pause-circle-fill class="pause" :size="32"/>
-                      <span>The Weeknd – Real Life</span>
-                    </div>
-                    <span>04:34</span>
-                  </div>
-                </template>
-              </a-list-item-meta>
-            </a-list-item>
-            <a-list-item class="list-item">
-              <a-list-item-meta>
-                <template #title>
-                  <div class="song-list-item">
-                    <div class="song-list-item-name">
-                      <icon-play-circle-fill class="play" :size="32"/>
-                      <icon-pause-circle-fill class="pause" :size="32"/>
-                      <span>The Weeknd – Real Life</span>
-                    </div>
-                    <span>04:34</span>
-                  </div>
-                </template>
-              </a-list-item-meta>
-            </a-list-item>
-            <a-list-item class="list-item">
-              <a-list-item-meta>
-                <template #title>
-                  <div class="song-list-item">
-                    <div class="song-list-item-name">
-                      <icon-play-circle-fill class="play" :size="32"/>
-                      <icon-pause-circle-fill class="pause" :size="32"/>
-                      <span>The Weeknd – Real Life</span>
-                    </div>
-                    <span>04:34</span>
-                  </div>
-                </template>
-              </a-list-item-meta>
-            </a-list-item>
-
-            <a-list-item class="list-item">
-              <a-list-item-meta>
-                <template #title>
-                  <div class="song-list-item">
-                    <div class="song-list-item-name">
-                      <icon-play-circle-fill class="play" :size="32"/>
-                      <icon-pause-circle-fill class="pause" :size="32"/>
-                      <span>The Weeknd – Real Life</span>
-                    </div>
-                    <span>04:34</span>
-                  </div>
-                </template>
-              </a-list-item-meta>
-            </a-list-item>
-            <a-list-item class="list-item">
-              <a-list-item-meta>
-                <template #title>
-                  <div class="song-list-item">
-                    <div class="song-list-item-name">
-                      <icon-play-circle-fill class="play" :size="32"/>
-                      <icon-pause-circle-fill class="pause" :size="32"/>
-                      <span>The Weeknd – Real Life</span>
-                    </div>
-                    <span>04:34</span>
-                  </div>
-                </template>
-              </a-list-item-meta>
-            </a-list-item>
-            <a-list-item class="list-item">
-              <a-list-item-meta>
-                <template #title>
-                  <div class="song-list-item">
-                    <div class="song-list-item-name">
-                      <icon-play-circle-fill class="play" :size="32"/>
-                      <icon-pause-circle-fill class="pause" :size="32"/>
-                      <span>The Weeknd – Real Life</span>
-                    </div>
-                    <span>04:34</span>
-                  </div>
-                </template>
-              </a-list-item-meta>
-            </a-list-item>
-            <a-list-item class="list-item">
-              <a-list-item-meta>
-                <template #title>
-                  <div class="song-list-item">
-                    <div class="song-list-item-name">
-                      <icon-play-circle-fill class="play" :size="32"/>
-                      <icon-pause-circle-fill class="pause" :size="32"/>
-                      <span>The Weeknd – Real Life</span>
-                    </div>
-                    <span>04:34</span>
-                  </div>
-                </template>
-              </a-list-item-meta>
-            </a-list-item>
-            <a-list-item class="list-item">
-              <a-list-item-meta>
-                <template #title>
-                  <div class="song-list-item">
-                    <div class="song-list-item-name">
-                      <icon-play-circle-fill class="play" :size="32"/>
-                      <icon-pause-circle-fill class="pause" :size="32"/>
-                      <span>The Weeknd – Real Life</span>
-                    </div>
-                    <span>04:34</span>
-                  </div>
+                <template #description>
+                  <span class="song-list-singer" v-for="sing in song.singer" :key="sing.id">{{ sing.name }}</span>
                 </template>
               </a-list-item-meta>
             </a-list-item>
@@ -168,7 +51,27 @@
 </template>
 
 <script setup lang="ts">
-import {IconPauseCircleFill, IconPlayArrow, IconPlayCircleFill} from "@arco-design/web-vue/es/icon";</script>
+import {IconPauseCircleFill, IconPlayArrow, IconPlayCircleFill} from "@arco-design/web-vue/es/icon";
+import {useRoute} from "vue-router";
+import {useAblum} from "@/hooks";
+import {getSongTime} from "@/hooks/computed";
+import {ref} from "vue";
+
+const route = useRoute()
+const isPaused = ref(true)
+const {
+  loading,
+  albumInfo,
+  albumSongs,
+  getAlbumInfo,
+  getAlbumSongs,
+} = useAblum()
+
+getAlbumInfo(route.query.id as string).then(() => {
+  getAlbumSongs(albumInfo.value.mid as string)
+})
+
+</script>
 
 <style scoped lang="less">
 
@@ -202,7 +105,6 @@ import {IconPauseCircleFill, IconPlayArrow, IconPlayCircleFill} from "@arco-desi
     }
 
     .singer-name {
-      height: 33px;
       font-size: 19px;
       font-weight: 500;
       color: #B3B3B3;
@@ -214,6 +116,12 @@ import {IconPauseCircleFill, IconPlayArrow, IconPlayCircleFill} from "@arco-desi
       width: 100%;
     }
 
+    .song-list-singer {
+      color: #B3B3B3;
+      font-size: 12px;
+      margin-left: 40px;
+    }
+
     .song-list-item {
       width: 100%;
       display: flex;
@@ -222,6 +130,7 @@ import {IconPauseCircleFill, IconPlayArrow, IconPlayCircleFill} from "@arco-desi
       .play, .pause {
         color: #808080 !important;
         transition: all .15s ease-in-out;
+
         &:hover {
           color: @theme-color !important;
         }
@@ -232,6 +141,7 @@ import {IconPauseCircleFill, IconPlayArrow, IconPlayCircleFill} from "@arco-desi
         align-items: center;
         gap: 10px;
       }
+
 
       span {
         height: 27px;

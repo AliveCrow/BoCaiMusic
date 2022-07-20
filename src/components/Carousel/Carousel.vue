@@ -1,22 +1,4 @@
 <template>
-<!--  <swiper-->
-<!--      class="swiper"-->
-<!--      :style="{-->
-<!--        '&#45;&#45;swiper-navigation-color': '#fff',-->
-<!--      }"-->
-<!--      :modules="modules"-->
-<!--      :loop="true"-->
-<!--      direction="horizontal"-->
-<!--      :slides-per-view="3"-->
-<!--      :space-between="30"-->
-<!--      :navigation="true"-->
-<!--      @swiper="setSwiperRef"-->
-<!--      @resize="handleResize"-->
-<!--  >-->
-<!--    <swiper-slide class="slide" v-for="image in images" :key="image">-->
-<!--      <img :src="image" alt="">-->
-<!--    </swiper-slide>-->
-<!--  </swiper>-->
   <a-carousel
       :autoPlay="true"
       animation-name="card"
@@ -27,9 +9,9 @@
       height: '360px',
     }"
   >
-    <a-carousel-item v-for="image in images" :key="image" :style="{ width: '60%' }">
+    <a-carousel-item v-for="image in images" :key="image" :style="{ width: '60%' }" @click="onImageClick(image)">
       <img
-          :src="image"
+          :src="image.picUrl"
           :style="{
           width: '100%',
         }"
@@ -40,50 +22,47 @@
 
 <script lang="ts">
 import {defineComponent, ref} from 'vue'
-import SwiperClass, {Navigation, Thumbs} from 'swiper'
-import {Swiper, SwiperSlide} from 'swiper/vue'
+import {Navigation} from 'swiper'
 import 'swiper/css'
 import 'swiper/css/navigation'
 import BoCaiMusic from "@/api/BoCaiMusic";
+import {image} from '@/types/common'
+import {useRouter} from 'vue-router'
+import {navigateToAlbum} from "@/hooks/common";
 
 export default defineComponent({
   name: 'Carousel',
-  components: {
-    // Swiper,
-    // SwiperSlide
-  },
   setup() {
-    const images= ref([
-      'https://p1-arco.byteimg.com/tos-cn-i-uwbnlip3yd/cd7a1aaea8e1c5e3d26fe2591e561798.png~tplv-uwbnlip3yd-webp.webp',
-    ])
-    let swiperRef: SwiperClass | null = null
-    const setSwiperRef = (swiper: SwiperClass) => {
-      swiperRef = swiper
-    }
-
-    const handleResize = () => {
-      swiperRef?.changeDirection(window.innerWidth <= 960 ? 'vertical' : 'horizontal')
-    }
-
+    const router = useRouter()
+    const images = ref<image[] | []>([])
     const init = async () => {
       const localImages = localStorage.getItem('local-images')
-      if(!localImages) {
+      if (!localImages) {
         const res = await BoCaiMusic.recommend_banner_get()
-        images.value = res.data.map((r: {picUrl: string}) => r.picUrl)
+        images.value = res.data.map((r: { picUrl: string }) => r.picUrl)
         localStorage.setItem('local-images', JSON.stringify(images.value))
       } else {
         images.value = JSON.parse(localImages)
         const res = await BoCaiMusic.recommend_banner_get()
-        images.value = res.data.map((r: {picUrl: string}) => r.picUrl)
+        images.value = res.data
       }
     }
     init()
 
+    const onImageClick = (item: image) => {
+      if (item.id) {
+        navigateToAlbum(router, {
+          query: {
+            id: item.id
+          }
+        })
+      }
+    }
+
     return {
       modules: [Navigation],
-      setSwiperRef,
-      handleResize,
-      images
+      images,
+      onImageClick
     }
   }
 })

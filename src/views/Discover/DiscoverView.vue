@@ -58,7 +58,7 @@
     <div class="row-image">
       <a-row :gutter="40">
         <a-col :span="6" v-for="album in albumList" :key="album.id">
-          <a-spin :loading="albumLoading">
+          <a-spin :loading="albumLoading" style="width:100%">
             <a-image
                 :preview="false"
                 class="album-img"

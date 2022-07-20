@@ -51,11 +51,13 @@
                 </template>
                 <a-card-meta class="discover-card-meta">
                   <template #title>
-                    <div class="discover-card-meta-title">{{ diss.dissname }}</div>
+                    <div class="discover-card-meta-title">
+                      {{ diss.dissname }}
+                    </div>
                   </template>
                   <template #description>
-                    <div class="discover-card-meta-description" v-for="item in diss.creator" :key="item.encrypt_uin">
-                      {{ item.name }}
+                    <div class="discover-card-meta-description">
+                      {{ diss.creator.name }}
                     </div>
                   </template>
                 </a-card-meta>

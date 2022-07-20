@@ -2,7 +2,6 @@ import {ref} from "vue";
 import BoCaiMusic from "@/api/BoCaiMusic";
 import useAppStore from "@/store";
 import {storeToRefs} from "pinia";
-import {Message} from "@arco-design/web-vue";
 
 const appStore = useAppStore()
 const { newSongType, currentTag, currentRankId } = storeToRefs(appStore)
@@ -137,15 +136,24 @@ export function useRank() {
         rankData.value = res.data
     }
     const rankSongList = ref([])
-    const getRankSongList = async () => {
+    const getRankSongList = async (pageChange: boolean | undefined = false) => {
+        if (!pageChange) {
+            currentPage.value = 1
+        }
         loading.value = true
         try {
             const res = await BoCaiMusic.rank_id_get({
                 id: currentRankId.value,
-                currentPage: currentPage.value,
-                pageSize: pageSize.value,
+                opts: {
+                    currentPage: currentPage.value,
+                    pageSize: pageSize.value,
+                }
             })
-            rankSongList.value = res.data.list
+            if (pageChange) {
+                rankSongList.value = rankSongList.value.concat(res.data.list)
+            } else {
+                rankSongList.value = res.data.list
+            }
         } catch (e) {
             rankSongList.value = []
         }
@@ -159,5 +167,27 @@ export function useRank() {
         rankSongList,
         getRankData,
         getRankSongList
+    }
+}
+
+export function useAblum() {
+    const loading = ref(false)
+    const albumInfo = ref({})
+    const albumSongs = ref([])
+    const getAlbumInfo = async (albummid: string) => {
+        const res = await BoCaiMusic.album_albummid_get({albummid})
+        albumInfo.value = res.data
+    }
+    const getAlbumSongs = async (albummid: string) => {
+        const res = await BoCaiMusic.album_songs_get({albummid})
+        albumSongs.value = res.data.list
+    }
+
+    return {
+        loading,
+        albumInfo,
+        albumSongs,
+        getAlbumInfo,
+        getAlbumSongs,
     }
 }

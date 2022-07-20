@@ -4,7 +4,12 @@
       {{ CONFIG.sysName }}
     </div>
     <!--    <a-input-search class="search-input" :style="{width:'320px'}" placeholder="Please enter something"/>-->
-    <a-auto-complete allow-clear class="search-input" :data="data" @search="handleSearch" :style="{width:'320px'}" placeholder="关键字" />
+<!--    <a-auto-complete allow-clear class="search-input" :data="data" @search="handleSearch" :style="{width:'320px'}" placeholder="关键字" />-->
+<!--    <a-mention :model-value="keyword" :data="data" placeholder="关键字" :prefix="keyword"  @change="onMentionChange" @select="onMentionSelect" />-->
+    <a-select :options="options"  :style="{width:'320px'}" allow-search  placeholder="关键字"
+              @search="handleSelectSearch" >
+    </a-select>
+
     <a-space :size="[53]" class="nav-list">
       <a-button status="nav" type="text" v-for="item in navList" :class="route.name === item.routeName?'active': ''"
                 :key="item.label" @click="toRoute(item)">
@@ -13,7 +18,7 @@
     </a-space>
     <a-dropdown @select="onDropdownSelect">
       <a-avatar :style="{ backgroundColor: '#999999' }">
-        <IconUser/>
+        未登陆
       </a-avatar>
       <template #content>
         <a-doption v-for="item in dropdownList" :key="item.label" :value="item" :disabled="item.disabled">{{ item.label }}</a-doption>
@@ -41,7 +46,8 @@
 import CONFIG from '/config.json'
 import {IconUser} from '@arco-design/web-vue/es/icon';
 import {useRoute, useRouter} from "vue-router";
-import {ref,reactive} from "vue";
+import {ref, reactive, h} from "vue";
+import BoCaiMusic from "@/api/BoCaiMusic";
 
 interface NavItem {
   label: string,
@@ -70,9 +76,13 @@ const data = ref<string[]>([])
 const toRoute = (e: NavItem) => {
   router.push({name: e.routeName})
 }
-const handleSearch = (value: string) => {
+const handleSearch = async (value: string) => {
   if (value) {
-    data.value = [...Array(5)].map((_, index) => `${value}-${index}`)
+    const res = await BoCaiMusic.search_get({
+      keyword: value
+    })
+    console.log(res.data.list)
+    data.value = res.data.list.map(r => `${r.name}——${value}`)
   } else {
     data.value = []
   }
@@ -112,6 +122,21 @@ const form = reactive({
   post: '',
 })
 
+let options = ref([])
+let keyword = ref('')
+const handleSelectSearch = async (e:string) => {
+  options.value = []
+  const res = await BoCaiMusic.search_get({
+    keyword: e
+  })
+  keyword.value = e
+  options.value = res.data.list.map(r => {
+    return {
+      label: r.name + '——' + e,
+      value: r.mid
+    }
+  })
+}
 </script>
 
 <style scoped lang="less">

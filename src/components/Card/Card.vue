@@ -49,7 +49,7 @@ const headerStyle = {
     padding: 0 10px;
 
     &-title {
-      width: 183px;
+      max-width: 180px;
       .text-ellipsis
     }
 
