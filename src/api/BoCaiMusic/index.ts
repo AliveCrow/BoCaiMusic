@@ -4,6 +4,14 @@ import http from '../util'
 // 不要在这里面手动添加api, 生成的api会覆盖
 // 不要在这里面手动添加api, 生成的api会覆盖
 
+/** 播放链接 */
+function song_url_get (opts?: any) {
+  return http.request({
+    method: 'get',
+    url: `/song/url`,
+    params: opts,
+  })
+}
 /** 获取专辑信息 */
 function album_albummid_get ({albummid, opts}: any) {
   return http.request({
@@ -197,6 +205,7 @@ function rank_id_get ({id, opts}: any) {
   })
 }
 export default {
+  song_url_get,
   album_albummid_get,
   songlist_category_get,
   user_create_songlist_get,

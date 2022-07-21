@@ -10,6 +10,7 @@ export function useNewSong() {
     const loading = ref(false)
     const newSongList = ref([])
     const pageSize = ref(12)
+    const total = ref(0)
     const currentPage = ref(1)
     const getNewSongList = async () => {
         loading.value = true
@@ -17,17 +18,28 @@ export function useNewSong() {
             type: newSongType.value,
             pageSize: pageSize.value,
             currentPage: currentPage.value
-
         })
         loading.value = false
         newSongList.value = res.data.list
+        total.value = res.data.total
+    }
+    const handleSongNextPage = async () => {
+        currentPage.value += 1
+        await getNewSongList()
+    }
+    const handleSongPrePage = async () => {
+        currentPage.value -= 1
+        await getNewSongList()
     }
     return {
         loading,
         newSongList,
         pageSize,
+        total,
         currentPage,
-        getNewSongList
+        getNewSongList,
+        handleSongNextPage,
+        handleSongPrePage
     }
 }
 
@@ -56,23 +68,36 @@ export function useNewMv() {
     const loading = ref(false)
     const mvList = ref([])
     const pageSize = ref(16)
+    const total = ref(0)
     const currentPage = ref(1)
     const getNewMvList = async () => {
         loading.value = true
-        const res =await BoCaiMusic.mv_new_get({
+        const res = await BoCaiMusic.mv_new_get({
             type: newSongType.value,
             pageSize: pageSize.value,
             currentPage: currentPage.value
         })
         loading.value = false
-        mvList.value = res.data
+        mvList.value = res.data.list
+        total.value = res.data.total
+    }
+    const handleMvPrePage = async () => {
+        currentPage.value -= 1
+        await getNewMvList()
+    }
+    const handleMvNextPage = async () => {
+        currentPage.value += 1
+        await getNewMvList()
     }
     return {
         loading,
         mvList,
+        total,
         pageSize,
         currentPage,
-        getNewMvList
+        getNewMvList,
+        handleMvPrePage,
+        handleMvNextPage
     }
 }
 

@@ -5,13 +5,25 @@
     </a-layout-header>
     <a-layout-content>
       <router-view />
+      <audio ref="playerAudio" class="player"></audio>
     </a-layout-content>
     <!--    <a-layout-footer>Footer</a-layout-footer>-->
   </a-layout>
   <PlayerSlider/>
 </template>
 <script setup>
-import Nav from "@/components/Nav/Nav";</script>
+import Nav from "@/components/Nav/Nav";
+import {onMounted, ref} from "vue";
+import usePlayer from "@/store/player";
+const playerAudio = ref(null)
+const playerStore = usePlayer()
+onMounted(() => {
+  playerStore.audio = playerAudio.value
+  playerStore.audio?.addEventListener('timeupdate', () => {
+    playerStore.updateCurrentTime()
+  })
+})
+</script>
 <style lang="scss">
 #app {
   font-family: Roboto-Medium, Roboto, Avenir, Helvetica, Arial, sans-serif;

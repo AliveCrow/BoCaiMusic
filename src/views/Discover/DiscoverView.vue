@@ -1,7 +1,7 @@
 <template>
   <Carousel  />
 
-  <Menu title="新歌首发" :tabs="menuTabs" @tabClick="onTabClick"/>
+  <Menu title="新歌首发" :tabs="MENU_TABS" @tabClick="onTabClick"/>
 
   <div class="discover">
     <Card style="height: 740px">
@@ -10,16 +10,17 @@
       </template>
       <template #extra>
         <a-space>
-          <a-button type="text">
+          <a-button type="text" :disabled="currentPage <= 1" @click="handleSongPrePage">
             <template #icon>
-              <icon-arrow-left class="discover-card-icon" :strokeWidth="5"/>
+              <icon-arrow-left class="discover-card-icon"  :strokeWidth="5"/>
             </template>
           </a-button>
-          <a-button type="text">
+          <a-button type="text" :disabled="currentPage >= parseInt(`${total/pageSize}`)" @click="handleSongNextPage">
             <template #icon>
               <icon-arrow-right class="discover-card-icon" :strokeWidth="5"/>
             </template>
           </a-button>
+          {{currentPage}}/ {{ parseInt(`${total/pageSize}`)}}
         </a-space>
       </template>
       <template #default>
@@ -27,7 +28,7 @@
           <div class="discover-card-content">
             <a-row :gutter="30" style="justify-content: space-between">
               <a-col :span="4" v-for="song in newSongList" :key="song.id">
-                <a-card :bordered="false" class="discover-card-item">
+                <a-card :bordered="false" class="discover-card-item" hoverable @click="onSongClick(song)">
                   <template #cover>
                     <div
                         :style="{overflow: 'hidden'}"
@@ -78,16 +79,17 @@
       </template>
       <template #extra>
         <a-space>
-          <a-button type="text">
+          <a-button type="text" :disabled="mvCurrentPage <= 1" @click="handleMvPrePage">
             <template #icon>
               <icon-arrow-left class="discover-card-icon" :strokeWidth="5"/>
             </template>
           </a-button>
-          <a-button type="text">
+          <a-button type="text" :disabled="mvCurrentPage >= parseInt(`${mvTotal/mvPageSize}`)" @click="handleMvNextPage">
             <template #icon>
               <icon-arrow-right class="discover-card-icon" :strokeWidth="5"/>
             </template>
           </a-button>
+          {{mvCurrentPage}}/ {{ parseInt(`${mvTotal/mvPageSize}`)}}
         </a-space>
       </template>
       <template #default>
@@ -126,32 +128,15 @@ import {computed, ref} from "vue";
 import useAppStore from "@/store";
 import {storeToRefs} from "pinia";
 import {useNewAlbum, useNewMv, useNewSong} from "@/hooks";
+import {MENU_TABS} from "@/constants";
+import {SongType} from "@/types/song";
+import usePlayer from "@/store/player";
 
 const appStore = useAppStore()
 const {newSongType} = storeToRefs(appStore)
-const menuTabs: tab[] = [
-  {
-    label: '最新',
-  },
-  {
-    label: '内地',
-  },
-  {
-    label: '港台',
-  },
-  {
-    label: '欧美',
-  },
-  {
-    label: '韩国',
-  },
-  {
-    label: '日本',
-  },
-]
 
 const selectTab = computed(() => {
-  return (e: number) => menuTabs.find((tab, index) => index === e)
+  return (e: number) => MENU_TABS.find((tab, index) => index === e)
 })
 const onTabClick = (e: string) => {
   const num: number = Number(e) - 1
@@ -165,7 +150,10 @@ let {
   loading,
   newSongList,
   pageSize,
+  total,
   currentPage,
+  handleSongNextPage,
+  handleSongPrePage,
   getNewSongList
 } = useNewSong()
 getNewSongList()
@@ -183,9 +171,17 @@ let {
   mvList,
   pageSize: mvPageSize,
   currentPage: mvCurrentPage,
+  total: mvTotal,
+  handleMvPrePage,
+  handleMvNextPage,
   getNewMvList
 } = useNewMv()
 getNewMvList()
+
+const playerStore = usePlayer()
+const onSongClick = (e: SongType) => {
+  playerStore.setPlayingSong(e)
+}
 
 </script>
 
@@ -200,5 +196,12 @@ getNewMvList()
 .discover {
   padding: 0 150px;
   .card-style();
+}
+.discover-card-item {
+  transition-property: all;
+}
+/deep/.discover-card-item:hover {
+  transform: translateY(-4px);
+  cursor: pointer;
 }
 </style>

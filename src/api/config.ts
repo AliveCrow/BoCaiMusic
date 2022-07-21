@@ -1,5 +1,5 @@
 import {AxiosRequestConfig} from 'axios'
 export default <AxiosRequestConfig>{
-  timeout: 10000,
+  timeout: 50000,
   baseURL: '/api'
 };

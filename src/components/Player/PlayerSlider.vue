@@ -9,43 +9,71 @@
         </template>
       </a-button>
       <div class="player-slider-line">
-        <div class="time">00:00</div>
-        <a-slider v-model="percent" :max="100" :step="0.1" :show-text="false"/>
-        <div class="time">15:12</div>
+        <div class="time">{{getSongTime(playerStore.progress)}}</div>
+        <a-slider v-model="vModelProgress" :max="playerStore.interval" :step="0.1" :show-text="false" @change="onProgressChange" />
+        <div class="time">{{getSongTime(playerStore.interval)}}</div>
       </div>
       <div class="player-slider-control">
         <a-space :size="[40]">
-          <icon-backward class="player-slider-icon" :size="iconSize"/>
-          <icon-pause-circle class="player-slider-icon" v-if="true" :size="iconSize"/>
-          <icon-play-circle class="player-slider-icon" v-else :size="iconSize"/>
-          <icon-forward class="player-slider-icon" :size="iconSize"/>
-          <a-dropdown position="tl">
+          <icon-backward class="player-slider-icon" :size="iconSize" @click="playerStore.pre" />
+          <icon-pause-circle class="player-slider-icon" @click="playerStore.paused" v-if="playerStore.playStatus==='PLAYING'" :size="iconSize"/>
+          <icon-play-circle class="player-slider-icon" @click="playerStore.play" v-else :size="iconSize"/>
+          <icon-forward class="player-slider-icon" @click="playerStore.next" :size="iconSize"/>
+          <a-trigger trigger="click" :unmount-on-close="false">
             <icon-unordered-list class="player-slider-icon" :size="iconSize"/>
             <template #content>
-              <a-doption>Option 1Option 1Option 1Option 1Option 1Option 1</a-doption>
-              <a-doption>OpOption 1Option 1tion 1</a-doption>
-              <a-doption>Option 1</a-doption>
-              <a-doption>OptOption 1Option 1Option 1ion 1</a-doption>
-              <a-doption>OptOption 1Option 1Option 1ion 1</a-doption>
-              <a-doption>Option 1</a-doption>
-              <a-doption>Option 1</a-doption>
+              <div class="play-list-container">
+                <a-list >
+                  <a-list-item v-for="song in playerStore.playList" :key="song.id" class="list-wrapper" style="padding: 0 20px">
+                    <a-list-item-meta :title="song.name">
+                      <template #avatar>
+                        <a-avatar shape="square">
+                          <img alt="avatar" :src="`https://y.qq.com/music/photo_new/T002R300x300M000${song.album.mid}.jpg?max_age=2592000`" />
+                        </a-avatar>
+                      </template>
+                    </a-list-item-meta>
+                  </a-list-item>
+                </a-list>
+              </div>
+            </template>
+          </a-trigger>
+          <a-dropdown position="tl" class="play-list" >
+            <template #content>
+              <a-doption v-for="song in playerStore.playList" :key="song.id"
+              >
+                {{ song.name }}
+                <a-button type="text" shape="circle">
+                  <icon-close />
+                </a-button>
+              </a-doption>
+              <a-empty v-if="playerStore.playList.length <= 0" />
             </template>
           </a-dropdown>
         </a-space>
         <a-space :size="[40]">
-          <a-avatar :size="90" shape="square">Arco</a-avatar>
+          <a-avatar :size="90" shape="square">
+            <a-image v-if="playerStore.playing.album"
+                :src="`https://y.qq.com/music/photo_new/T002R300x300M000${playerStore.playing?.album?.mid}.jpg?max_age=2592000`"
+            >
+            </a-image>
+          </a-avatar>
           <a-space direction="vertical">
-            <div class="song-name">The Basics Of Buying</div>
-            <div class="song-description">Name Group</div>
+            <div class="song-name">{{ playerStore.playing.name || '没有歌曲正在播放'}}</div>
+            <div class="song-description">
+              <span v-for="(singer, index) in playerStore.playing.singer" :key="singer.id">
+                {{ singer.name }}{{ index + 1 === playerStore.playing.singer.length ? '' : ',' }}
+              </span>
+            </div>
           </a-space>
         </a-space>
         <a-space :size="[40]">
           <icon-mute-fill class="player-slider-icon" :size="iconSize"/>
-          <a-progress class="player-slider-icon" :percent="0.2" :style="{width:'224px'}" :show-text="false"/>
-          <icon-sound-fill class="player-slider-icon" :size="iconSize"/>
-          <icon-sync v-if="true" class="player-slider-icon" :size="iconSize"/>
-          <icon-translate v-else class="player-slider-icon" :size="iconSize"/>
-          <icon-refresh class="player-slider-icon" :size="iconSize"/>
+          <a-slider class="player-slider-icon" :style="{width:'224px'}" v-model="volumeSlider" :max="100" :step="1"/>
+          <!--          <a-progress class="player-slider-icon" :steps="100" :percent="playerStore.volume/ 100" :style="{width:'224px'}" :show-text="false"/>-->
+          <!--          <icon-sound-fill class="player-slider-icon" :size="iconSize"/>-->
+          <icon-sync v-if="playerStore.playMode === 'LOOP'" class="player-slider-icon" :size="iconSize"/>
+          <icon-translate v-else-if="playerStore.playMode === 'ONE_LOOP'" class="player-slider-icon" :size="iconSize"/>
+          <icon-refresh v-else-if="playerStore.playMode === 'ORDER'" class="player-slider-icon" :size="iconSize"/>
         </a-space>
       </div>
     </div>
@@ -62,19 +90,24 @@
 <script setup lang="ts">
 import {
   IconBackward,
+  IconDown,
   IconForward,
   IconMuteFill,
   IconPauseCircle,
   IconPlayCircle,
   IconRefresh,
-  IconSoundFill,
   IconSync,
   IconTranslate,
   IconUnorderedList,
   IconUp,
-  IconDown,
+  IconClose
 } from "@arco-design/web-vue/es/icon";
-import {ref} from "vue";
+import {computed, nextTick, onMounted, ref} from "vue";
+import usePlayer from "@/store/player";
+import {getSongTime} from "@/hooks/computed";
+import player from "@/store/player";
+
+const playerStore = usePlayer()
 
 const iconSize = 25
 const percent = ref(20.2)
@@ -87,13 +120,39 @@ const handleToggleDrawer = () => {
   visible.value = !visible.value
 }
 
+const volumeSlider = computed({
+  get() {
+    return playerStore.volume
+  },
+  set(val: number) {
+    playerStore.volume = val
+  }
+})
+const vModelProgress = computed({
+  get() {
+    return playerStore.progress
+  },
+  set(val: number) {
+    playerStore.progress = val
+  }
+})
+
+const onProgressChange = (val: number) => {
+  playerStore.audio.currentTime = val
+}
+
+
 </script>
 
 <style lang="less">
-.player-slider-drawer{
-  .arco-drawer-body,.arco-drawer {
+.player-slider-drawer {
+  .arco-drawer-body, .arco-drawer {
     overflow: visible !important;
   }
+}
+
+.play-list {
+  min-width: 250px;
 }
 </style>
 
@@ -102,6 +161,35 @@ const handleToggleDrawer = () => {
   position: fixed;
   bottom: 0;
   width: 100%;
+  /deep/ .arco-slider-bar {
+    transition: all .15s linear;
+  }
+  /deep/.arco-slider-btn {
+    display: none;
+  }
+
+  .player {
+    width: 100%;
+  }
+}
+.list-wrapper {
+  transition: all .15s linear;
+  &:hover {
+    background-color: @theme-color !important;
+    cursor: pointer;
+    box-shadow: 0 0px 8px 0 rgba(0, 0, 0, 0.15);
+    transform: translateY(-2px);
+    /deep/.arco-list-item-meta-title {
+      color: #fff !important;
+    }
+  }
+}
+.play-list-container {
+  padding: 10px;
+  width: 300px;
+  background-color: var(--color-bg-popup);
+  border-radius: 4px;
+  box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.15);
 }
 .icon-up-btn-open {
   position: fixed !important;
@@ -127,14 +215,7 @@ const handleToggleDrawer = () => {
 
 
 
-  .player-slider-icon {
-    transition: all .1s linear;
-  }
 
-  .player-slider-icon:hover {
-    color: @theme-color !important;
-    transform: scale(1.05);
-  }
 
   .time {
     font-size: 16px;
@@ -177,5 +258,12 @@ const handleToggleDrawer = () => {
     -webkit-background-clip: text;
   }
 }
+.player-slider-icon {
+  transition: all .1s linear;
+}
 
+.player-slider-icon:hover {
+  color: @theme-color !important;
+  transform: scale(1.03);
+}
 </style>

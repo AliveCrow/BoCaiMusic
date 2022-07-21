@@ -6,13 +6,13 @@
     <!--    <a-input-search class="search-input" :style="{width:'320px'}" placeholder="Please enter something"/>-->
 <!--    <a-auto-complete allow-clear class="search-input" :data="data" @search="handleSearch" :style="{width:'320px'}" placeholder="关键字" />-->
 <!--    <a-mention :model-value="keyword" :data="data" placeholder="关键字" :prefix="keyword"  @change="onMentionChange" @select="onMentionSelect" />-->
-    <a-select :options="options"  :style="{width:'320px'}" allow-search  placeholder="关键字"
-              @search="handleSelectSearch" >
+    <a-select :options="options" class="search-input" :style="{width:'320px'}" allow-clear allow-search placeholder="关键字"
+              @search="handleSelectSearch" @clear="options = []">
     </a-select>
 
     <a-space :size="[53]" class="nav-list">
-      <a-button status="nav" type="text" v-for="item in navList" :class="route.name === item.routeName?'active': ''"
-                :key="item.label" @click="toRoute(item)">
+      <a-button status="nav" type="text" v-for="item in NAV" :class="route.name === item.routeName?'active': ''"
+                :key="item.label" @click="navigateTo(router,{name: item.routeName})">
         {{ item.label }}
       </a-button>
     </a-space>
@@ -21,20 +21,28 @@
         未登陆
       </a-avatar>
       <template #content>
-        <a-doption v-for="item in dropdownList" :key="item.label" :value="item" :disabled="item.disabled">{{ item.label }}</a-doption>
+        <a-doption v-for="item in dropdownList(appStore.loginStatus)" :key="item.label" :value="item" :disabled="item.disabled">{{
+            item.label
+          }}
+        </a-doption>
       </template>
     </a-dropdown>
-    <a-modal width="400"  v-model:visible="visible" @cancel="visible = false" :on-before-ok="handleBeforeOk" unmountOnClose>
+    <a-modal
+        width="400"
+        v-model:visible="visible"
+        @cancel="visible = false"
+        :on-before-ok="(done) => handleBeforeOk(done, handleLogin)"
+        unmountOnClose>
       <template #title>
-        Title
+        {{ title }}
       </template>
       <div>
         <a-form :model="form" :style="{width:'400px'}">
           <a-form-item field="name" label="账号">
-            <a-input v-model="form.name" placeholder="please enter your 账号..." />
+            <a-input allow-clear v-model="form.name" placeholder="请输入账号..."/>
           </a-form-item>
-          <a-form-item field="post" label="密码">
-            <a-input v-model="form.post" placeholder="please enter your 密码..." />
+          <a-form-item field="password" label="密码">
+            <a-input allow-clear v-model="form.password" type="password" placeholder="请输入密码..."/>
           </a-form-item>
         </a-form>
       </div>
@@ -44,82 +52,52 @@
 
 <script setup lang="ts">
 import CONFIG from '/config.json'
-import {IconUser} from '@arco-design/web-vue/es/icon';
 import {useRoute, useRouter} from "vue-router";
-import {ref, reactive, h} from "vue";
+import {reactive, ref} from "vue";
 import BoCaiMusic from "@/api/BoCaiMusic";
-
-interface NavItem {
-  label: string,
-  routeName: string,
-}
+import {navigateTo} from "@/hooks/common";
+import {NAV} from '@/constants/Nav'
+import {dropdownList} from "@/hooks/computed";
+import useModal from "@/hooks/useModal";
+import {Message} from "@arco-design/web-vue";
+import useAppStore from "@/store";
 
 const router = useRouter()
 const route = useRoute()
-const navList: NavItem[] = [
-  {
-    label: '发现',
-    routeName: 'Home'
-  },
-  {
-    label: '分类',
-    routeName: 'Category'
-  },
-  {
-    label: '排行榜',
-    routeName: 'Rank'
-  }
-]
+const appStore = useAppStore()
+
 const data = ref<string[]>([])
-
-
-const toRoute = (e: NavItem) => {
-  router.push({name: e.routeName})
+const {
+  visible,
+  title,
+  handleBeforeOk
+} = useModal('登陆您的账户')
+const handleLogin = async (done: (closed: boolean) => void) => {
+  const cookieRes = await BoCaiMusic.user_bind_post({
+    username: form.name,
+    password: form.password,
+  })
+  BoCaiMusic.user_setCookie_post({
+    data: cookieRes.data
+  }).then(result => {
+    Message.success(result.data)
+    appStore.loginStatus = true
+    done(true)
+  })
 }
-const handleSearch = async (value: string) => {
-  if (value) {
-    const res = await BoCaiMusic.search_get({
-      keyword: value
-    })
-    console.log(res.data.list)
-    data.value = res.data.list.map(r => `${r.name}——${value}`)
-  } else {
-    data.value = []
-  }
-}
-
-const dropdownList = [
-  {
-    label: '登陆',
-    name: 'Login',
-    disabled: false
-  },
-  {
-    label: '主页',
-    name: 'Mine',
-    disabled: false
-  },
-  {
-    label: '退出登陆',
-    name: 'LogOut',
-    disabled: false
-  }
-]
-const visible = ref(false);
 const onDropdownSelect = (e: { label: string, name: string }) => {
-  if(e.label === '登陆') {
+  if (e.label === '登陆') {
     visible.value = true
+  } else if (e.label === '退出登陆') {
+    appStore.loginStatus = false
   } else {
     router.push({name: e.name})
   }
 }
-const handleBeforeOk = (done: (closed: boolean) => void) => {
-  done(true)
-}
 
 const form = reactive({
   name: '',
-  post: '',
+  password: '',
 })
 
 let options = ref([])

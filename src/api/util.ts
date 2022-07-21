@@ -4,7 +4,6 @@ import {Message} from "@arco-design/web-vue";
 
 const instance = axios.create(config)
 
-
 instance.interceptors.request.use(
     config => {
         return config
