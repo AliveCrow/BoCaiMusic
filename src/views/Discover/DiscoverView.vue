@@ -42,10 +42,10 @@
                   </template>
                   <a-card-meta class="discover-card-meta">
                     <template #title>
-                      <div class="discover-card-meta-title">{{ song.name }}</div>
+                      <div :class="['discover-card-meta-title', playerStore.playing.id === song.id?'is-playing':'']">{{ song.name }}</div>
                     </template>
                     <template #description>
-                      <div class="discover-card-meta-description">{{ song.album.name }}</div>
+                      <div :class="['discover-card-meta-description', playerStore.playing.id === song.id?'is-playing':'']">{{ song.album.name }}</div>
                     </template>
                   </a-card-meta>
                 </a-card>
@@ -58,7 +58,7 @@
 
     <div class="row-image">
       <a-row :gutter="40">
-        <a-col :span="6" v-for="album in albumList" :key="album.id">
+        <a-col :span="6" v-for="album in albumList" :key="album.id" >
           <a-spin :loading="albumLoading" style="width:100%">
             <a-image
                 :preview="false"
@@ -67,6 +67,11 @@
                 height="201px"
                 :src="`https://y.qq.com/music/photo_new/T002R300x300M000${album.mid}.jpg?max_age=2592000`"
                 :title="album.name"
+                @click="navigateToAlbum(router, {
+                  query: {
+                    id: album.id
+                  }
+                })"
             />
           </a-spin>
         </a-col>
@@ -131,7 +136,11 @@ import {useNewAlbum, useNewMv, useNewSong} from "@/hooks";
 import {MENU_TABS} from "@/constants";
 import {SongType} from "@/types/song";
 import usePlayer from "@/store/player";
+import {navigateToAlbum} from "@/hooks/common";
+import {useRouter} from "vue-router";
 
+
+const router = useRouter()
 const appStore = useAppStore()
 const {newSongType} = storeToRefs(appStore)
 
@@ -196,6 +205,9 @@ const onSongClick = (e: SongType) => {
 .discover {
   padding: 0 150px;
   .card-style();
+  .is-playing {
+    color: rgba(@theme-color, .6) !important;
+  }
 }
 .discover-card-item {
   transition-property: all;

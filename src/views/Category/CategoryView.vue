@@ -20,16 +20,18 @@
     </template>
     <template #extra>
       <a-space>
-        <a-button type="text">
+        <a-button type="text" :disabled="currentPage <= 1" @click="handlePrePage">
           <template #icon>
-            <icon-arrow-left class="card-icon" :strokeWidth="5"/>
+            <icon-arrow-left class="card-icon" :strokeWidth="5" />
           </template>
         </a-button>
-        <a-button type="text">
+        <a-button type="text" :disabled="currentPage >= parseInt(`${total/pageSize}`)" @click="handleNextPage">
           <template #icon>
-            <icon-arrow-right class="card-icon" :strokeWidth="5"/>
+            <icon-arrow-right class="card-icon" :strokeWidth="5"  />
           </template>
         </a-button>
+        {{currentPage}}/ {{ parseInt(`${total/pageSize}`)}}
+
       </a-space>
     </template>
     <template>
@@ -37,7 +39,11 @@
         <a-spin :loading="loading">
           <a-row :gutter="30" style="justify-content: space-between">
             <a-col :span="4" v-for="diss in dissList" :key="diss.dissid">
-              <a-card :bordered="false" class="discover-card-item">
+              <a-card :bordered="false" class="discover-card-item" @click="navigateToSongList(router, {
+                  query: {
+                    id: diss.dissid
+                  }
+                })">
                 <template #cover>
                   <div
                       :style="{overflow: 'hidden'}"
@@ -76,6 +82,8 @@ import {IconArrowLeft, IconArrowRight} from "@arco-design/web-vue/es/icon";
 import {useCategory} from "@/hooks";
 import useAppStore from "@/store";
 import {storeToRefs} from "pinia";
+import {navigateToSongList} from "@/hooks/common";
+import {useRouter} from "vue-router";
 
 type tag = {
   allsorts?: [],
@@ -85,6 +93,7 @@ type tag = {
 }
 
 const appStore = useAppStore()
+const router = useRouter()
 const {currentTag} = storeToRefs(appStore)
 currentTag.value.categoryName = '全部'
 const handleChecked = (item: tag) => {
@@ -92,17 +101,23 @@ const handleChecked = (item: tag) => {
   getSongListByCategoryId()
 }
 
+
 let {
   loading,
   pageSize,
   currentPage,
+  total,
   dissList,
   categoryList,
   getCategoryList,
-  getSongListByCategoryId
+  getSongListByCategoryId,
+  handleNextPage,
+  handlePrePage
 } = useCategory()
 getCategoryList()
 getSongListByCategoryId()
+
+
 </script>
 
 <style scoped lang="less">
@@ -203,10 +218,16 @@ getSongListByCategoryId()
 .discover-card-item {
   height: 260px;
   margin-bottom: 35px;
+  transition-property: all;
 
   /deep/ .arco-card-body {
     padding: 0;
   }
+}
+
+/deep/ .discover-card-item:hover {
+  transform: translateY(-4px);
+  cursor: pointer;
 }
 
 .discover-card-meta {

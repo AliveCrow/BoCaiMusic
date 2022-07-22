@@ -1,6 +1,6 @@
 <template>
   <div class="nav">
-    <div class="nav-logo">
+    <div class="nav-logo" @click="onClickLogo">
       {{ CONFIG.sysName }}
     </div>
     <!--    <a-input-search class="search-input" :style="{width:'320px'}" placeholder="Please enter something"/>-->
@@ -115,6 +115,11 @@ const handleSelectSearch = async (e:string) => {
     }
   })
 }
+const onClickLogo = () => {
+  navigateTo(router, {
+    name: 'Home'
+  })
+}
 </script>
 
 <style scoped lang="less">
@@ -143,6 +148,7 @@ const handleSelectSearch = async (e:string) => {
   }
 
   .nav-logo {
+    cursor: pointer;
     height: 32px;
     font-size: 27px;
     margin-right: 65px;

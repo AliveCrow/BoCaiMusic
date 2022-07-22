@@ -7,7 +7,7 @@ export interface SongType {
     subtitle: string;
     singer: Singer[];
     album: Album;
-    mv: Mv;
+    mv?: Mv;
     interval: number;
     isonly: number;
     language: number;
@@ -113,10 +113,10 @@ interface Album {
     id: number;
     mid: string;
     name: string;
-    title: string;
-    subtitle: string;
-    time_public: string;
-    pmid: string;
+    title?: string;
+    subtitle?: string;
+    time_public?: string;
+    pmid?: string;
 }
 
 interface Singer {
@@ -138,7 +138,61 @@ export enum PlayStatus {
 // one loop
 //loop
 export enum PlayMode {
-    ORDER = 'ORDER',
     LOOP = 'LOOP',
     ONE_LOOP = 'ONE_LOOP',
+}
+
+
+export interface SongListItem {
+    albumdesc: string;
+    albumid: number;
+    albummid: string;
+    albumname: string;
+    alertid: number;
+    belongCD: number;
+    cdIdx: number;
+    interval: number;
+    isonly: number;
+    label: string;
+    msgid: number;
+    pay: SongListItemPay;
+    preview: Preview;
+    rate: number;
+    singer: SongListItemSinger[];
+    size128: number;
+    size320: number;
+    size5_1: number;
+    sizeape: number;
+    sizeflac: number;
+    sizeogg: number;
+    songid: number;
+    songmid: string;
+    songname: string;
+    songorig: string;
+    songtype: number;
+    strMediaMid: string;
+    stream: number;
+    switch: number;
+    type: number;
+    vid: string;
+}
+interface SongListItemSinger {
+    id: number;
+    mid: string;
+    name: string;
+}
+interface Preview {
+    trybegin: number;
+    tryend: number;
+    trysize: number;
+}
+interface SongListItemPay {
+    payalbum: number;
+    payalbumprice: number;
+    paydownload: number;
+    payinfo: number;
+    payplay: number;
+    paytrackmouth: number;
+    paytrackprice: number;
+    timefree: number;
 }

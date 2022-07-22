@@ -18,7 +18,7 @@ export const usePlayer = defineStore('player', {
         playList: [],
         playing: {},
         playStatus: PlayStatus.PAUSED,
-        playMode: PlayMode.ORDER,
+        playMode: PlayMode.LOOP,
         volume: 20,
         interval: 0,
         progress: 0,
@@ -38,38 +38,37 @@ export const usePlayer = defineStore('player', {
             this.play()
         },
         addToPlayList(songInfo: SongType | SongType[]) {
-            let hasSong
-            console.log(songInfo)
+            let hasSong: SongType | undefined
             if(Array.isArray(songInfo)) {
-                hasSong = this.playList.filter(song => songInfo.find(r => r.id === song.id))
+                hasSong = this.playList.filter(song => songInfo.find(r => r.id === song.id))[0] || undefined
             } else {
                 hasSong = this.playList.find(song => song.id === songInfo.id)
             }
-            // todo
-            console.log()
-            if(hasSong && this.playList.length <= 0) {
+            if (this.playList.length === 0) {
                 if (Array.isArray(songInfo)) {
-                    this.playList.concat(songInfo)
+                    this.playList = songInfo.concat(this.playList)
                 } else {
-                    this.playList.push(songInfo)
+                    this.playList = [songInfo].concat(this.playList)
+                }
+                return
+            }
+            if (!hasSong) {
+                if (Array.isArray(songInfo)) {
+                    this.playList = songInfo.concat(this.playList)
+                } else {
+                    this.playList = [songInfo].concat(this.playList)
                 }
             }
         },
-        removeFromPlayList(songMid: string) {
-            const index = this.playList.findIndex(songInfo => songInfo.mid === songMid)
+        async removeFromPlayList(song: SongType) {
+            const index = this.playList.findIndex(r => r.id === song.id)
+            if(this.playStatus === PlayStatus.PLAYING) {
+                await this.next()
+            }
             this.playList.splice(index, 1)
-        },
-        setPlayStatus(status: PlayStatus) {
-            this.playStatus = status
-        },
-        setPlayMode(mode: PlayMode) {
-            this.playMode = mode
         },
         setVolume(volume: number) {
             this.volume = volume
-        },
-        updateProgress() {
-            // this.progress = this.progress + 0.1
         },
         play() {
             this.audio.play()
@@ -88,19 +87,48 @@ export const usePlayer = defineStore('player', {
             }
         },
         async next() {
-            console.log("next")
-            console.log(this.playList)
-            if(this.playingIndex <= 0) {
-                await this.setPlayingSong(this.playList[this.playingIndex])
+            const maxIndex = this.playList.length - 1
+            const nextIndex = this.playingIndex + 1
+            if (maxIndex >= nextIndex) { // 后面还有歌曲
+                //todo 根据播放模式进行操作
+                if (this.playingIndex <= 0) {
+                    if (this.playList.length > 1) {
+                        await this.setPlayingSong(this.playList[this.playingIndex + 1])
+                    } else {
+                        await this.setPlayingSong(this.playList[this.playingIndex])
+                    }
+                } else {
+                    await this.setPlayingSong(this.playList[this.playingIndex + 1])
+                }
             } else {
-                await this.setPlayingSong(this.playList[this.playingIndex + 1])
+                await this.setPlayingSong(this.playList[0])
             }
+
         },
         // 当前播放时间
         updateCurrentTime() {
             this.progress = this.audio.currentTime
+        },
+        toggleVolume() {
+            if (!this.volume) {
+                const v = localStorage.getItem('volume') as never * 1 || 20
+                this.volume = v
+            } else {
+                localStorage.setItem('volume', `${this.volume}`)
+                this.volume = 0
+                this.audio.mute = true
+            }
+        },
+        togglePlayMode() {
+            if (PlayMode[this.playMode] === 'LOOP') {
+                this.playMode = PlayMode.ONE_LOOP
+                return
+            }
+            if (PlayMode[this.playMode] === 'ONE_LOOP') {
+                this.playMode = PlayMode.LOOP
+                return
+            }
         }
-
     },
     getters:{
         playingIndex(): number {

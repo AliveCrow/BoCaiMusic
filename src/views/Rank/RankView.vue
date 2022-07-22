@@ -6,7 +6,7 @@
           <a-tab-pane v-for="item in rank.list" :key="item.topId" :title="item.label">
             <a-spin :loading="loading" style="width: 100%">
               <a-list :bordered="false" :max-height="540" @scroll="onScroll"  @reach-bottom="onReachBottom" >
-                <a-list-item v-for="song in rankSongList" :key="song.id">
+                <a-list-item :class="[playerStore.playing.id===song.id?'is-playing': '']" v-for="song in rankSongList" :key="song.id" @click="handleSongClick(song)">
                   <a-list-item-meta :title="song.name" :description="song.singerName">
                     <template #avatar>
                       <a-avatar shape="square" :size="64">
@@ -29,8 +29,11 @@
 import {ref, watch} from 'vue'
 import {useRank} from "@/hooks";
 import useAppStore from "@/store";
+import {SongType} from "@/types/song";
+import usePlayer from "@/store/player";
 
 const appStore = useAppStore()
+const playerStore = usePlayer()
 let {
   loading,
   currentPage,
@@ -69,6 +72,10 @@ const onReachBottom = () => {
 
 }
 
+const handleSongClick = (e: SongType) => {
+  playerStore.setPlayingSong(e)
+}
+
 </script>
 
 <style scoped lang="less">
@@ -85,6 +92,13 @@ const onReachBottom = () => {
   /deep/ .arco-tabs-nav-vertical {
     min-height: 550px ;
   }
-
+  .is-playing {
+    /deep/.arco-list-item-meta-title {
+      color: rgba(@theme-color, .6) !important;
+    }
+    /deep/.arco-list-item-meta-description {
+      color: rgba(@theme-color, .6) !important;
+    }
+  }
 }
 </style>

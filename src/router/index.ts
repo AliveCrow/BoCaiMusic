@@ -30,6 +30,11 @@ const routes: Array<RouteRecordRaw> = [
     path: '/mine',
     name: 'Mine',
     component: () => import('@/views/Mine/MineView.vue')
+  },
+  {
+    path: '/songlist',
+    name: 'SongList',
+    component:  () => import('@/views/SongList/SongListView.vue')
   }
 ]
 

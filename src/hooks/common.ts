@@ -11,6 +11,14 @@ export async function navigateToAlbum(router: Router, opts: navigateOpts) {
     })
 }
 
+export async function navigateToSongList(router: Router, opts: navigateOpts) {
+    await router.push({
+        name: 'SongList',
+        ...opts
+    })
+}
+
+
 export async function navigateTo(router: Router, opts: navigateOpts | string) {
     await router.push(opts)
 }

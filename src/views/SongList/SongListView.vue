@@ -5,9 +5,9 @@
         <a-space direction="vertical" align="center" :size="25">
           <a-image
               width="200"
-              :src="albumInfo.picurl"
+              :src="dissInfo.logo"
           />
-          <a-button type="primary" class="play-btn" @click="play">
+          <a-button  type="primary" class="play-btn" @click="play">
             <template #icon>
               <icon-play-arrow/>
             </template>
@@ -16,19 +16,19 @@
           </a-button>
         </a-space>
         <a-space direction="vertical" style="flex: 1">
-          <div class="album-name">{{ albumInfo.name }}</div>
+          <div class="album-name">{{ dissInfo.dissname }}</div>
           <a-typography-paragraph
               :ellipsis="{
                 rows: 3,
                 expandable: true,
               }"
               class="singer-name">
-            {{ albumInfo.desc }}
+            <span v-html="dissInfo.desc" />
           </a-typography-paragraph>
           <a-list :hoverable="true">
             <a-list-item
-                :class="['list-item', playerStore.playing.id === song.id?'is-playing':'']"
-                v-for="song in albumSongs"
+                v-for="song in songList"
+                :class="['list-item', playerStore.playing.mid === song.id?'is-playing':'']"
                 :key="song.id"
                 @click="handleListClick(song)"
             >
@@ -36,9 +36,25 @@
                 <template #title>
                   <div class="song-list-item">
                     <div class="song-list-item-name">
-                      <!--                      <icon-play-circle-fill v-if="isPaused" class="play" :size="32"/>-->
-                      <!--                      <icon-pause-circle-fill v-else class="pause" :size="32"/>-->
-                      <span>{{ song.title }}</span>
+                      <a-tooltip :content="inPlayList(song)?'从播放列表移除':'加入播放列表'">
+                        <icon-minus-circle
+                            v-if="inPlayList(song)"
+                            :size="20"
+                            class="add"
+                            title="从播放列表删除"
+                            alt="从播放列表删除"
+                            @click.stop="playerStore.removeFromPlayList(song)"
+                        />
+                        <icon-plus-circle-fill
+                            v-else
+                            :size="20"
+                            class="add"
+                            @click.stop="playerStore.addToPlayList(song)"
+                        />
+                      </a-tooltip>
+<!--                      <icon-play-circle-fill v-if="isPaused" class="play" :size="32"/>-->
+<!--                      <icon-pause-circle-fill v-else class="pause" :size="32"/>-->
+                      <span>{{ song.songname }}</span>
                     </div>
                     <span>{{ getSongTime(song.interval) }}</span>
                   </div>
@@ -56,38 +72,40 @@
 </template>
 
 <script setup lang="ts">
-import {IconPlayArrow} from "@arco-design/web-vue/es/icon";
+import {IconPauseCircleFill, IconPlayArrow, IconPlayCircleFill, IconPlusCircleFill, IconMinusCircle} from "@arco-design/web-vue/es/icon";
 import {useRoute} from "vue-router";
-import {useAblum} from "@/hooks";
 import {getSongTime} from "@/hooks/computed";
-import {ref} from "vue";
+import {computed, ref} from "vue";
+import {useSongList} from "@/hooks";
 import usePlayer from "@/store/player";
-import {SongType} from "@/types/song";
+import {SongListItem, SongType} from "@/types/song";
 
 const route = useRoute()
-const playerStore = usePlayer()
 const isPaused = ref(true)
+
+const playerStore = usePlayer()
 const {
   loading,
-  albumInfo,
-  albumSongs,
-  getAlbumInfo,
-  getAlbumSongs,
-} = useAblum()
-
-getAlbumInfo(route.query.id as string).then(() => {
-  getAlbumSongs(albumInfo.value.mid as string)
-})
+  dissInfo,
+  songList,
+  getSongList
+} = useSongList()
+getSongList(route.query.id as string)
 
 const play = () => {
-  const _temp = albumSongs.value
-  playerStore.addToPlayList(_temp)
-  playerStore.setPlayingSong(_temp[0])
+  playerStore.addToPlayList(songList.value)
+  playerStore.setPlayingSong(songList.value[0])
 }
 
-const handleListClick = (song: SongType) => {
-  playerStore.setPlayingSong(song)
+const handleListClick = (r: SongType) => {
+  playerStore.setPlayingSong(r)
 }
+
+const inPlayList = computed(() => {
+  return (song: SongType) => {
+    return playerStore.playList.findIndex(r => r.id === song.songid) !== -1
+  }
+})
 </script>
 
 <style scoped lang="less">
@@ -136,6 +154,7 @@ const handleListClick = (song: SongType) => {
     .song-list-singer {
       color: #B3B3B3;
       font-size: 12px;
+      margin-left: 40px;
     }
 
     .song-list-item {
@@ -143,7 +162,7 @@ const handleListClick = (song: SongType) => {
       display: flex;
       justify-content: space-between;
 
-      .play, .pause {
+      .play, .pause, .add {
         color: #808080 !important;
         transition: all .15s ease-in-out;
 
@@ -167,13 +186,11 @@ const handleListClick = (song: SongType) => {
         -webkit-background-clip: text;
       }
     }
-
     .is-playing {
       span {
         color: rgba(@theme-color, .6) !important;
       }
     }
-
   }
 }
 

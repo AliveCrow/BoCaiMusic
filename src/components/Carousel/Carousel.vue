@@ -28,7 +28,7 @@ import 'swiper/css/navigation'
 import BoCaiMusic from "@/api/BoCaiMusic";
 import {image} from '@/types/common'
 import {useRouter} from 'vue-router'
-import {navigateToAlbum} from "@/hooks/common";
+import {navigateTo, navigateToAlbum} from "@/hooks/common";
 
 export default defineComponent({
   name: 'Carousel',
@@ -49,13 +49,27 @@ export default defineComponent({
     }
     init()
 
+    const imageType = [
+        '10002', // album
+        '10014', // playlist
+        '3001'
+    ]
     const onImageClick = (item: image) => {
-      if (item.id) {
+      if (item.type === '10002') {
         navigateToAlbum(router, {
           query: {
             id: item.id
           }
         })
+      } else if (item.type === '10014') {
+        navigateTo(router, {
+          name: 'SongList',
+          query: {
+            id: item.id
+          }
+        })
+      } else if (item.type === '3001') {
+        window.open(item.id)
       }
     }
 

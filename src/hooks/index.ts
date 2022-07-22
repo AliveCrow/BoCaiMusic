@@ -2,6 +2,7 @@ import {ref} from "vue";
 import BoCaiMusic from "@/api/BoCaiMusic";
 import useAppStore from "@/store";
 import {storeToRefs} from "pinia";
+import {SongListItem, SongType} from "@/types/song";
 
 const appStore = useAppStore()
 const { newSongType, currentTag, currentRankId } = storeToRefs(appStore)
@@ -112,6 +113,7 @@ export function useCategory() {
     const dissList = ref([])
     const pageSize = ref(12)
     const currentPage = ref(1)
+    const total = ref(0)
     const loading = ref(false)
 
     const getCategoryList = async () => {
@@ -123,9 +125,9 @@ export function useCategory() {
         } else {
             categoryList.value = JSON.parse(localCategory)
             const res = await BoCaiMusic.songlist_category_get()
-            categoryList.value = res.data
+            localStorage.setItem('local-category', JSON.stringify(res.data))
+            total.value = res.data.length
         }
-
     }
     const getSongListByCategoryId = async () => {
         loading.value = true
@@ -137,15 +139,27 @@ export function useCategory() {
         })
         loading.value = false
         dissList.value = res.data.list
+        total.value = res.data.total
+    }
+    const handleNextPage = async () => {
+        currentPage.value += 1
+        await getSongListByCategoryId()
+    }
+    const handlePrePage = async () => {
+        currentPage.value -= 1
+        await getSongListByCategoryId()
     }
     return {
         loading,
         pageSize,
         currentPage,
+        total,
         dissList,
         categoryList,
         getCategoryList,
-        getSongListByCategoryId
+        getSongListByCategoryId,
+        handleNextPage,
+        handlePrePage
     }
 }
 
@@ -214,5 +228,36 @@ export function useAblum() {
         albumSongs,
         getAlbumInfo,
         getAlbumSongs,
+    }
+}
+
+export function useSongList() {
+    const loading = ref(false)
+    const dissInfo = ref({})
+    const songList = ref<SongType[]>([])
+    const getSongList = async (id: string) => {
+        const res = await BoCaiMusic.songlist_id_get({id})
+        dissInfo.value = res.data
+        songList.value = res.data.songlist.map((r: SongListItem) => {
+            return {
+                ...r,
+                id: r.songid,
+                mid: r.songmid,
+                name: r.songname,
+                title: r.songname,
+                album: {
+                    id: r.albummid,
+                    mid: r.albummid,
+                    name: r.albumname,
+                }
+            }
+        })
+    }
+
+    return {
+        loading,
+        dissInfo,
+        songList,
+        getSongList
     }
 }
