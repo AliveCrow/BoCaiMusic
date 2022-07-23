@@ -1,6 +1,7 @@
 import {defineStore} from "pinia";
 import {PlayMode, PlayStatus, SongType} from "@/types/song";
 import BoCaiMusic from "@/api/BoCaiMusic";
+import {usePlayList} from "@/store/playList";
 
 export const usePlayer = defineStore('player', {
     state: () => <{
@@ -25,50 +26,18 @@ export const usePlayer = defineStore('player', {
         timer: null
     }),
     actions: {
-        async setSongUrl(id: string) {
-            const res = await BoCaiMusic.song_url_get({id})
-            this.audio.src = res.data[id]
-        },
-        async setPlayingSong(songInfo: SongType) {
-            await this.setSongUrl(songInfo.mid)
+        async setPlay(songInfo: SongType) {
+            const res = await BoCaiMusic.song_url_get({id: songInfo.mid})
             this.progress = 0
             this.playing = songInfo
+            this.playStatus = PlayStatus.PLAYING
             this.interval = songInfo.interval
-            this.addToPlayList(songInfo)
-            this.play()
-        },
-        addToPlayList(songInfo: SongType | SongType[]) {
-            let hasSong: SongType | undefined
-            if(Array.isArray(songInfo)) {
-                hasSong = this.playList.filter(song => songInfo.find(r => r.id === song.id))[0] || undefined
-            } else {
-                hasSong = this.playList.find(song => song.id === songInfo.id)
-            }
-            if (this.playList.length === 0) {
-                if (Array.isArray(songInfo)) {
-                    this.playList = songInfo.concat(this.playList)
-                } else {
-                    this.playList = [songInfo].concat(this.playList)
-                }
-                return
-            }
-            if (!hasSong) {
-                if (Array.isArray(songInfo)) {
-                    this.playList = songInfo.concat(this.playList)
-                } else {
-                    this.playList = [songInfo].concat(this.playList)
-                }
-            }
-        },
-        async removeFromPlayList(song: SongType) {
-            const index = this.playList.findIndex(r => r.id === song.id)
-            if(this.playStatus === PlayStatus.PLAYING) {
-                await this.next()
-            }
-            this.playList.splice(index, 1)
+            this.audio.src = res.data[songInfo.mid]
+            this.audio.play()
         },
         setVolume(volume: number) {
             this.volume = volume
+            this.audio.volume = volume/100
         },
         play() {
             this.audio.play()
@@ -79,44 +48,43 @@ export const usePlayer = defineStore('player', {
             this.playStatus = PlayStatus.PAUSED
         },
         async pre() {
-            console.log('pre')
-            if(this.playingIndex <= 0) {
-                await this.setPlayingSong(this.playList[this.playingIndex])
+            const playListStore = usePlayList()
+            const index = playListStore.playingSongIndex
+            if(index === 0) {
+                const prev = playListStore.list[0]
+                await this.setPlay(prev)
             } else {
-                await this.setPlayingSong(this.playList[this.playingIndex - 1])
+                const prev = playListStore.list[playListStore.playingSongIndex - 1]
+                await this.setPlay(prev)
             }
         },
         async next() {
-            const maxIndex = this.playList.length - 1
-            const nextIndex = this.playingIndex + 1
-            if (maxIndex >= nextIndex) { // 后面还有歌曲
-                //todo 根据播放模式进行操作
-                if (this.playingIndex <= 0) {
-                    if (this.playList.length > 1) {
-                        await this.setPlayingSong(this.playList[this.playingIndex + 1])
-                    } else {
-                        await this.setPlayingSong(this.playList[this.playingIndex])
-                    }
-                } else {
-                    await this.setPlayingSong(this.playList[this.playingIndex + 1])
-                }
+            const playListStore = usePlayList()
+            const index = playListStore.playingSongIndex
+            console.log(index)
+            if(index === playListStore.list.length - 1) {
+                const prev = playListStore.list[0]
+                await this.setPlay(prev)
             } else {
-                await this.setPlayingSong(this.playList[0])
+                const prev = playListStore.list[index + 1]
+                await this.setPlay(prev)
             }
-
         },
         // 当前播放时间
         updateCurrentTime() {
             this.progress = this.audio.currentTime
         },
         toggleVolume() {
+            console.log('toggleVolume')
             if (!this.volume) {
                 const v = localStorage.getItem('volume') as never * 1 || 20
+                this.audio.muted = false
                 this.volume = v
+                this.audio.volume = v/100
             } else {
                 localStorage.setItem('volume', `${this.volume}`)
                 this.volume = 0
-                this.audio.mute = true
+                this.audio.muted = true
             }
         },
         togglePlayMode() {

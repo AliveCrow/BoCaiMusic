@@ -138,11 +138,14 @@ import {SongType} from "@/types/song";
 import usePlayer from "@/store/player";
 import {navigateToAlbum} from "@/hooks/common";
 import {useRouter} from "vue-router";
+import player from "@/store/player";
+import {usePlayList} from "@/store/playList";
 
 
 const router = useRouter()
 const appStore = useAppStore()
 const {newSongType} = storeToRefs(appStore)
+const playListStore = usePlayList()
 
 const selectTab = computed(() => {
   return (e: number) => MENU_TABS.find((tab, index) => index === e)
@@ -189,7 +192,8 @@ getNewMvList()
 
 const playerStore = usePlayer()
 const onSongClick = (e: SongType) => {
-  playerStore.setPlayingSong(e)
+  playerStore.setPlay(e)
+  playListStore.add(e)
 }
 
 </script>

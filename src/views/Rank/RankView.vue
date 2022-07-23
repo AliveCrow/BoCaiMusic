@@ -31,9 +31,11 @@ import {useRank} from "@/hooks";
 import useAppStore from "@/store";
 import {SongType} from "@/types/song";
 import usePlayer from "@/store/player";
+import {usePlayList} from "@/store/playList";
 
 const appStore = useAppStore()
 const playerStore = usePlayer()
+const playListStore = usePlayList()
 let {
   loading,
   currentPage,
@@ -73,7 +75,8 @@ const onReachBottom = () => {
 }
 
 const handleSongClick = (e: SongType) => {
-  playerStore.setPlayingSong(e)
+  playerStore.setPlay(e)
+  playListStore.add(e)
 }
 
 </script>

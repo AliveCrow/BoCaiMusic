@@ -39,6 +39,7 @@ export interface SongType {
     vs: string[];
     vi: any[];
     ktag: string;
+    isPlaying?: boolean;
 }
 
 interface Volume {

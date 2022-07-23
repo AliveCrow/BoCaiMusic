@@ -14,22 +14,11 @@
 <script setup>
 import Nav from "@/components/Nav/Nav";
 import {onMounted, ref} from "vue";
-import usePlayer from "@/store/player";
-import {PlayMode} from "@/types/song";
+import {initPlayer} from "@/hooks/player";
 const playerAudio = ref(null)
-const playerStore = usePlayer()
+
 onMounted(() => {
-  playerStore.audio = playerAudio.value
-  playerStore.audio?.addEventListener('timeupdate', () => {
-    playerStore.updateCurrentTime()
-  })
-  playerStore.audio?.addEventListener('ended', () => {
-    if(playerStore.playMode === PlayMode.ONE_LOOP) {
-      playerStore.setPlayingSong(playerStore.playList[playerStore.playingIndex])
-      return
-    }
-    playerStore.next()
-  })
+  initPlayer(playerAudio.value)
 })
 </script>
 <style lang="scss">

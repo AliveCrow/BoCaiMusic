@@ -24,7 +24,7 @@
             <template #content>
               <div class="play-list-container">
                 <a-list>
-                  <a-list-item v-for="song in playerStore.playList"
+                  <a-list-item v-for="song in playListStore.list"
                                :key="song.id"
                                :class="['list-wrapper', playerStore.playing.id === song.id?'is-playing': '']"
                                style="padding: 0 20px"
@@ -43,18 +43,18 @@
               </div>
             </template>
           </a-trigger>
-          <a-dropdown position="tl" class="play-list" >
-            <template #content>
-              <a-doption v-for="song in playerStore.playList" :key="song.id"
-              >
-                {{ song.name }}
-                <a-button type="text" shape="circle">
-                  <icon-close />
-                </a-button>
-              </a-doption>
-              <a-empty v-if="playerStore.playList.length <= 0" />
-            </template>
-          </a-dropdown>
+<!--          <a-dropdown position="tl" class="play-list" >-->
+<!--            <template #content>-->
+<!--              <a-doption v-for="song in playerStore.playList" :key="song.id"-->
+<!--              >-->
+<!--                {{ song.name }}-->
+<!--                <a-button type="text" shape="circle">-->
+<!--                  <icon-close />-->
+<!--                </a-button>-->
+<!--              </a-doption>-->
+<!--              <a-empty v-if="playerStore.playList.length <= 0" />-->
+<!--            </template>-->
+<!--          </a-dropdown>-->
         </a-space>
         <a-space :size="[40]">
           <a-avatar :size="90" shape="square">
@@ -115,9 +115,10 @@ import {computed, ref, watch} from "vue";
 import usePlayer from "@/store/player";
 import {getSongTime} from "@/hooks/computed";
 import {SongType} from "@/types/song";
+import {usePlayList} from "@/store/playList";
 
 const playerStore = usePlayer()
-
+const playListStore = usePlayList()
 const iconSize = 25
 const visible = ref(false)
 const drawerStyle = {

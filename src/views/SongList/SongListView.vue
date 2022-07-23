@@ -28,7 +28,7 @@
           <a-list :hoverable="true">
             <a-list-item
                 v-for="song in songList"
-                :class="['list-item', playerStore.playing.mid === song.id?'is-playing':'']"
+                :class="['list-item', playerStore.playing.mid === song.mid?'is-playing':'']"
                 :key="song.id"
                 @click="handleListClick(song)"
             >
@@ -43,13 +43,13 @@
                             class="add"
                             title="从播放列表删除"
                             alt="从播放列表删除"
-                            @click.stop="playerStore.removeFromPlayList(song)"
+                            @click.stop="playList.remove(song)"
                         />
                         <icon-plus-circle-fill
                             v-else
                             :size="20"
                             class="add"
-                            @click.stop="playerStore.addToPlayList(song)"
+                            @click.stop="playList.add(song)"
                         />
                       </a-tooltip>
 <!--                      <icon-play-circle-fill v-if="isPaused" class="play" :size="32"/>-->
@@ -79,11 +79,13 @@ import {computed, ref} from "vue";
 import {useSongList} from "@/hooks";
 import usePlayer from "@/store/player";
 import {SongListItem, SongType} from "@/types/song";
+import {usePlayList} from "@/store/playList";
 
 const route = useRoute()
 const isPaused = ref(true)
 
 const playerStore = usePlayer()
+const playList = usePlayList()
 const {
   loading,
   dissInfo,
@@ -93,17 +95,18 @@ const {
 getSongList(route.query.id as string)
 
 const play = () => {
-  playerStore.addToPlayList(songList.value)
-  playerStore.setPlayingSong(songList.value[0])
+  playerStore.setPlay(songList.value[0])
+  playList.multipleAdd(songList.value)
 }
 
 const handleListClick = (r: SongType) => {
-  playerStore.setPlayingSong(r)
+  playerStore.setPlay(r)
+  playList.add(r)
 }
 
 const inPlayList = computed(() => {
   return (song: SongType) => {
-    return playerStore.playList.findIndex(r => r.id === song.songid) !== -1
+    return playList.list.findIndex(r => r.id === song.songid) !== -1
   }
 })
 </script>

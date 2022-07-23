@@ -63,9 +63,11 @@ import {getSongTime} from "@/hooks/computed";
 import {ref} from "vue";
 import usePlayer from "@/store/player";
 import {SongType} from "@/types/song";
+import {usePlayList} from "@/store/playList";
 
 const route = useRoute()
 const playerStore = usePlayer()
+const playListStore = usePlayList()
 const isPaused = ref(true)
 const {
   loading,
@@ -80,13 +82,13 @@ getAlbumInfo(route.query.id as string).then(() => {
 })
 
 const play = () => {
-  const _temp = albumSongs.value
-  playerStore.addToPlayList(_temp)
-  playerStore.setPlayingSong(_temp[0])
+  playerStore.setPlay(albumSongs.value[0])
+  playListStore.multipleAdd(albumSongs.value)
 }
 
 const handleListClick = (song: SongType) => {
-  playerStore.setPlayingSong(song)
+  playerStore.setPlay(song)
+  playListStore.add(song)
 }
 </script>
 

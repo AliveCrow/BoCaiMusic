@@ -4,10 +4,20 @@
       {{ CONFIG.sysName }}
     </div>
     <!--    <a-input-search class="search-input" :style="{width:'320px'}" placeholder="Please enter something"/>-->
-<!--    <a-auto-complete allow-clear class="search-input" :data="data" @search="handleSearch" :style="{width:'320px'}" placeholder="关键字" />-->
-<!--    <a-mention :model-value="keyword" :data="data" placeholder="关键字" :prefix="keyword"  @change="onMentionChange" @select="onMentionSelect" />-->
-    <a-select :options="options" class="search-input" :style="{width:'320px'}" allow-clear allow-search placeholder="关键字"
-              @search="handleSelectSearch" @clear="options = []">
+    <!--    <a-auto-complete allow-clear class="search-input" :data="data" @search="handleSearch" :style="{width:'320px'}" placeholder="关键字" />-->
+    <!--    <a-mention :model-value="keyword" :data="data" placeholder="关键字" :prefix="keyword"  @change="onMentionChange" @select="onMentionSelect" />-->
+    <a-select class="search-input" :style="{width:'320px'}" allow-clear :allow-search="{ retainInputValue: true }"
+              placeholder="关键字"
+              @search="handleSelectSearch"
+              @clear="options = []">
+      <template v-for="v in options" :key="v.name">
+        <a-optgroup :label="v.name">
+          <a-option v-for="item in v.itemlist" :key="item.id">
+            {{ item.name }}
+            <span style="visibility: hidden">{{keyword}}</span>
+          </a-option>
+        </a-optgroup>
+      </template>
     </a-select>
 
     <a-space :size="[53]" class="nav-list">
@@ -21,7 +31,8 @@
         未登陆
       </a-avatar>
       <template #content>
-        <a-doption v-for="item in dropdownList(appStore.loginStatus)" :key="item.label" :value="item" :disabled="item.disabled">{{
+        <a-doption v-for="item in dropdownList(appStore.loginStatus)" :key="item.label" :value="item"
+                   :disabled="item.disabled">{{
             item.label
           }}
         </a-doption>
@@ -59,8 +70,10 @@ import {navigateTo} from "@/hooks/common";
 import {NAV} from '@/constants/Nav'
 import {dropdownList} from "@/hooks/computed";
 import useModal from "@/hooks/useModal";
-import {Message} from "@arco-design/web-vue";
+import {Message, SelectOptionData, SelectOptionGroup} from "@arco-design/web-vue";
 import useAppStore from "@/store";
+
+type Option = string | number | SelectOptionData | SelectOptionGroup
 
 const router = useRouter()
 const route = useRoute()
@@ -100,20 +113,28 @@ const form = reactive({
   password: '',
 })
 
-let options = ref([])
+let options = ref<any[]>([])
 let keyword = ref('')
-const handleSelectSearch = async (e:string) => {
+const handleSelectSearch = async (e: string) => {
   options.value = []
-  const res = await BoCaiMusic.search_get({
+  keyword.value = e
+  const res = await BoCaiMusic.search_autocomplete_get({
     keyword: e
   })
-  keyword.value = e
-  options.value = res.data.list.map(r => {
-    return {
-      label: r.name + '——' + e,
-      value: r.mid
-    }
-  })
+  if (res.status === 200) {
+    options.value = res.data
+  } else {
+    options.value = []
+  }
+  //
+  // return
+
+  // options.value = res.data.list.map(r => {
+  //   return {
+  //     label: r.name + '——' + e,
+  //     value: r.mid
+  //   }
+  // })
 }
 const onClickLogo = () => {
   navigateTo(router, {
@@ -142,6 +163,7 @@ const onClickLogo = () => {
   display: flex;
   align-items: center;
   padding-left: 253px;
+  justify-content: space-evenly;
 
   .active {
     color: @theme-color !important;
