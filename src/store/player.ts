@@ -32,6 +32,7 @@ export const usePlayer = defineStore('player', {
             this.playing = songInfo
             this.playStatus = PlayStatus.PLAYING
             this.interval = songInfo.interval
+            this.audio.currentTime = 0
             this.audio.src = res.data[songInfo.mid]
             this.audio.play()
         },
