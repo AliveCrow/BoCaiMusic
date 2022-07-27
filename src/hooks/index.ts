@@ -3,11 +3,12 @@ import BoCaiMusic from "@/api/BoCaiMusic";
 import useAppStore from "@/store";
 import {storeToRefs} from "pinia";
 import {SongListItem, SongType} from "@/types/song";
-
-const appStore = useAppStore()
-const { newSongType, currentTag, currentRankId } = storeToRefs(appStore)
+import {navigateTo} from "@/hooks/common";
+import {useRouter} from "vue-router";
 
 export function useNewSong() {
+    const appStore = useAppStore()
+    const { newSongType } = storeToRefs(appStore)
     const loading = ref(false)
     const newSongList = ref([])
     const pageSize = ref(12)
@@ -45,6 +46,8 @@ export function useNewSong() {
 }
 
 export function useNewAlbum() {
+    const appStore = useAppStore()
+    const { newSongType } = storeToRefs(appStore)
     const loading = ref(false)
     const albumList = ref([])
     const num = ref(4)
@@ -66,6 +69,8 @@ export function useNewAlbum() {
 }
 
 export function useNewMv() {
+    const appStore = useAppStore()
+    const { newSongType } = storeToRefs(appStore)
     const loading = ref(false)
     const mvList = ref([])
     const pageSize = ref(16)
@@ -109,6 +114,8 @@ export function useCategory() {
         categoryName: string,
         usable: number
     }
+    const appStore = useAppStore()
+    const { currentTag } = storeToRefs(appStore)
     const categoryList = ref<tag[]>([])
     const dissList = ref([])
     const pageSize = ref(12)
@@ -164,6 +171,8 @@ export function useCategory() {
 }
 
 export function useRank() {
+    const appStore = useAppStore()
+    const { currentRankId } = storeToRefs(appStore)
     const loading = ref(false)
     const rankData = ref([])
     const currentPage = ref(1)
@@ -259,5 +268,53 @@ export function useSongList() {
         dissInfo,
         songList,
         getSongList
+    }
+}
+
+export function useNavSearch() {
+    const router = useRouter()
+    const popupVisibility = ref(false)
+    const keyword = ref('')
+    const searchResults = ref([])
+    const loading = ref(false)
+    const onKeywordChange = async (e: string) => {
+        popupVisibility.value = true
+        keyword.value = e
+        loading.value = true
+        const res = await BoCaiMusic.search_get({
+            t: 0,
+            keyword: e,
+            pageSize: 6
+        })
+        loading.value = false
+        searchResults.value = res.data.list
+    }
+    const onSearchItemClick = async (item: any) => {
+        popupVisibility.value = false
+        await navigateTo(router, {
+            name: 'SongInfo',
+            params: {
+                mid: item.mid
+            }
+        })
+    }
+    const onPressEnter = async () => {
+        popupVisibility.value = false
+        await navigateTo(router, {
+            name: 'Search',
+            query: {
+                keyword: keyword.value
+            }
+        })
+    }
+
+    return {
+        popupVisibility,
+        keyword,
+        searchResults,
+        loading,
+        onKeywordChange,
+        onSearchItemClick,
+        onPressEnter,
     }
 }

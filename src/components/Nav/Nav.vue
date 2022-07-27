@@ -3,23 +3,32 @@
     <div class="nav-logo" @click="onClickLogo">
       {{ CONFIG.sysName }}
     </div>
-    <!--    <a-input-search class="search-input" :style="{width:'320px'}" placeholder="Please enter something"/>-->
-    <!--    <a-auto-complete allow-clear class="search-input" :data="data" @search="handleSearch" :style="{width:'320px'}" placeholder="关键字" />-->
-    <!--    <a-mention :model-value="keyword" :data="data" placeholder="关键字" :prefix="keyword"  @change="onMentionChange" @select="onMentionSelect" />-->
-    <a-select class="search-input" :style="{width:'320px'}" allow-clear :allow-search="{ retainInputValue: true }"
-              placeholder="关键字"
-              @search="handleSelectSearch"
-              @clear="options = []">
-      <template v-for="v in options" :key="v.name">
-        <a-optgroup :label="v.name">
-          <a-option v-for="item in v.itemlist" :key="item.id">
-            {{ item.name }}
-            <span style="visibility: hidden">{{keyword}}</span>
-          </a-option>
-        </a-optgroup>
+    <a-trigger  :popup-visible="popupVisibility" position="bottom" :blur-to-close="false">
+      <a-input-search class="search-input"
+                      allow-clear
+                      :style="{width:'320px'}"
+                      placeholder="关键词"
+                      :model-value="keyword"
+                      @focus="keyword!=='' ? popupVisibility = true : ''"
+                      @input="onKeywordChange"
+                      @press-enter="onPressEnter"
+                      @clear="searchResults=[];keyword = '';popupVisibility = false"
+      />
+      <template #content>
+        <div class="search-result-list" ref="searchListRef">
+          <a-list size="small"
+                  :bordered="false"
+                  :split="false"
+                  :loading="loading"
+                  :hoverable="true"
+          >
+            <a-list-item v-for="item in searchResults" :key="item.id" @click="onSearchItemClick(item)">
+              {{ item.name }}
+            </a-list-item>
+          </a-list>
+        </div>
       </template>
-    </a-select>
-
+    </a-trigger>
     <a-space :size="[53]" class="nav-list">
       <a-button status="nav" type="text" v-for="item in NAV" :class="route.name === item.routeName?'active': ''"
                 :key="item.label" @click="navigateTo(router,{name: item.routeName})">
@@ -64,27 +73,30 @@
 <script setup lang="ts">
 import CONFIG from '/config.json'
 import {useRoute, useRouter} from "vue-router";
-import {reactive, ref} from "vue";
+import {nextTick, onMounted, onUnmounted, reactive, ref, watch} from "vue";
 import BoCaiMusic from "@/api/BoCaiMusic";
 import {navigateTo} from "@/hooks/common";
 import {NAV} from '@/constants/Nav'
 import {dropdownList} from "@/hooks/computed";
 import useModal from "@/hooks/useModal";
-import {Message, SelectOptionData, SelectOptionGroup} from "@arco-design/web-vue";
+import {Message} from "@arco-design/web-vue";
 import useAppStore from "@/store";
-
-type Option = string | number | SelectOptionData | SelectOptionGroup
+import {useNavSearch} from "@/hooks";
 
 const router = useRouter()
 const route = useRoute()
 const appStore = useAppStore()
 
-const data = ref<string[]>([])
-const {
-  visible,
-  title,
-  handleBeforeOk
-} = useModal('登陆您的账户')
+const onClickLogo = () => {
+  navigateTo(router, {
+    name: 'Home'
+  })
+}
+const {visible, title, handleBeforeOk} = useModal('登陆您的账户')
+const form = reactive({
+  name: '',
+  password: '',
+})
 const handleLogin = async (done: (closed: boolean) => void) => {
   const cookieRes = await BoCaiMusic.user_bind_post({
     username: form.name,
@@ -107,40 +119,32 @@ const onDropdownSelect = (e: { label: string, name: string }) => {
     router.push({name: e.name})
   }
 }
+const {
+  popupVisibility,
+  keyword,
+  searchResults,
+  loading,
+  onKeywordChange,
+  onSearchItemClick,
+  onPressEnter,
+} = useNavSearch()
 
-const form = reactive({
-  name: '',
-  password: '',
+const searchListRef = ref(null)
+const clickOutSide = (e: MouseEvent) => {
+  if(e) {
+    const className = (e.target as Element).className
+    if(className !== 'arco-list-item-content') {
+      popupVisibility.value = false
+    }
+  }
+}
+watch(popupVisibility, async (n) => {
+  if(n) {
+    await nextTick()
+    document.addEventListener('mousedown',clickOutSide)
+  }
 })
 
-let options = ref<any[]>([])
-let keyword = ref('')
-const handleSelectSearch = async (e: string) => {
-  options.value = []
-  keyword.value = e
-  const res = await BoCaiMusic.search_autocomplete_get({
-    keyword: e
-  })
-  if (res.status === 200) {
-    options.value = res.data
-  } else {
-    options.value = []
-  }
-  //
-  // return
-
-  // options.value = res.data.list.map(r => {
-  //   return {
-  //     label: r.name + '——' + e,
-  //     value: r.mid
-  //   }
-  // })
-}
-const onClickLogo = () => {
-  navigateTo(router, {
-    name: 'Home'
-  })
-}
 </script>
 
 <style scoped lang="less">
@@ -188,5 +192,13 @@ const onClickLogo = () => {
 
 }
 
+.search-result-list {
+  padding: 10px;
+
+  width: 300px;
+  background-color: var(--color-bg-popup);
+  border-radius: 4px;
+  box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.15);
+}
 
 </style>
