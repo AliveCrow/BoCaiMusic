@@ -277,17 +277,25 @@ export function useNavSearch() {
     const keyword = ref('')
     const searchResults = ref([])
     const loading = ref(false)
+    const timeout = ref<any>(null)
     const onKeywordChange = async (e: string) => {
-        popupVisibility.value = true
         keyword.value = e
-        loading.value = true
-        const res = await BoCaiMusic.search_get({
-            t: 0,
-            keyword: e,
-            pageSize: 6
-        })
-        loading.value = false
-        searchResults.value = res.data.list
+        if(timeout.value) {
+            clearTimeout(timeout.value)
+            timeout.value = null
+        }
+        timeout.value = setTimeout(async () => {
+            popupVisibility.value = true
+            loading.value = true
+            const res = await BoCaiMusic.search_get({
+                t: 0,
+                keyword: e,
+                pageSize: 6
+            })
+            loading.value = false
+            searchResults.value = res.data.list
+        }, 500)
+
     }
     const onSearchItemClick = async (item: any) => {
         popupVisibility.value = false

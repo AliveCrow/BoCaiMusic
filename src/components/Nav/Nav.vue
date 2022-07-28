@@ -82,6 +82,7 @@ import useModal from "@/hooks/useModal";
 import {Message} from "@arco-design/web-vue";
 import useAppStore from "@/store";
 import {useNavSearch} from "@/hooks";
+import {debounce} from "@/utils";
 
 const router = useRouter()
 const route = useRoute()
