@@ -4,7 +4,7 @@
       <a-space :size="103" >
         <div style="position: relative" >
           <a-avatar :size="200" shape="square" style="background-color: transparent;color: #000">
-            <a-typography-title :heading="2">{{route.query.keyword}}</a-typography-title>
+            <a-typography-title :heading="2">{{`"${route.query.keyword}"的搜索结果`}}</a-typography-title>
           </a-avatar>
           <a-button class="play-btn" type="primary" shape="round">
             <template #icon>
@@ -14,7 +14,11 @@
           </a-button>
         </div>
       </a-space>
-      <a-divider />
+      <a-tabs default-active-key="2" type="card-gutter">
+        <a-tab-pane v-for="item in TABS"  :key="item.label" :title="item.label">
+         {{item}}
+        </a-tab-pane>
+      </a-tabs>
       <a-list>
         <a-list-item class="list-item">
           <a-list-item-meta>
@@ -166,7 +170,22 @@
 import {IconPauseCircleFill, IconPlayArrowFill, IconPlayCircleFill} from "@arco-design/web-vue/es/icon";
 import {useRoute} from "vue-router";
 
+enum SEARCH_TYPE {
+  "ALBUM" = 0,
+  "MV" = 1,
+  "SINGER" = 2,
+  "SONG" = 3,
+}
+const TABS = [
+    {label: "单曲", value: 3},
+    {label: "歌手", value: 2},
+    {label: "专辑", value: 0},
+    {label: "MV", value: 1},
+]
+
 const route = useRoute()
+
+console.log(route)
 
 </script>
 

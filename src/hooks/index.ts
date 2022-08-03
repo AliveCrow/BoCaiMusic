@@ -287,24 +287,25 @@ export function useNavSearch() {
         timeout.value = setTimeout(async () => {
             popupVisibility.value = true
             loading.value = true
-            const res = await BoCaiMusic.search_get({
-                t: 0,
+            const res = await BoCaiMusic.search_autocomplete_get({
                 keyword: e,
-                pageSize: 6
             })
             loading.value = false
-            searchResults.value = res.data.list
+            searchResults.value = res.data
         }, 500)
 
     }
-    const onSearchItemClick = async (item: any) => {
+    const onSearchItemClick = async (item: SearchObj) => {
         popupVisibility.value = false
         await navigateTo(router, {
-            name: 'SongInfo',
-            params: {
-                mid: item.mid
+            name: 'Search',
+            query: {
+                type: item.type,
+                keyword: keyword.value
             }
         })
+        keyword.value = ''
+
     }
     const onPressEnter = async () => {
         popupVisibility.value = false

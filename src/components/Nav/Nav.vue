@@ -21,9 +21,14 @@
                   :split="false"
                   :loading="loading"
                   :hoverable="true"
+                  v-for="item in searchResults"
+                  :key="item.type"
           >
-            <a-list-item v-for="item in searchResults" :key="item.id" @click="onSearchItemClick(item)">
-              {{ item.name }}
+            <template #header>
+              <span style="color: #c9cdd4">{{item.name}}</span>
+            </template>
+            <a-list-item v-for="listItem in item.itemlist" :key="listItem.id" @click="onSearchItemClick(item)">
+              {{ listItem.name }}
             </a-list-item>
           </a-list>
         </div>
@@ -89,6 +94,7 @@ const route = useRoute()
 const appStore = useAppStore()
 
 const onClickLogo = () => {
+  keyword.value = ''
   navigateTo(router, {
     name: 'Home'
   })
